@@ -14,9 +14,9 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
  * Created by Jiri on 7. 7. 2014.
  */
 @Component
-public class KeyResourceAsm extends ResourceAssemblerSupport<Key, KeyResource> {
+public class KeyResourceAsmRename extends ResourceAssemblerSupport<Key, KeyResource> {
 
-    public KeyResourceAsm() {
+    public KeyResourceAsmRename() {
         super(KeyController.class, KeyResource.class);
     }
 
