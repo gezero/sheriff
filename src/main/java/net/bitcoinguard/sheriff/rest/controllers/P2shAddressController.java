@@ -1,7 +1,7 @@
 package net.bitcoinguard.sheriff.rest.controllers;
 
 import net.bitcoinguard.sheriff.core.entities.P2shAddress;
-import net.bitcoinguard.sheriff.core.services.P2shAddressService;
+import net.bitcoinguard.sheriff.core.services.P2shAddressesRepository;
 import net.bitcoinguard.sheriff.rest.entities.NewAddressRequest;
 import net.bitcoinguard.sheriff.rest.entities.P2shAddressResource;
 import net.bitcoinguard.sheriff.rest.entities.asm.P2shAddressResourceAsm;
@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequestMapping("/rest/addresses")
 public class P2shAddressController {
-    P2shAddressService service;
+    P2shAddressesRepository service;
 
-    public P2shAddressController(P2shAddressService service) {
+    public P2shAddressController(P2shAddressesRepository service) {
         this.service = service;
     }
 
@@ -25,7 +25,7 @@ public class P2shAddressController {
     public
     @ResponseBody
     P2shAddressResource getAddress(@PathVariable Long addressId) {
-        P2shAddress address = service.find(addressId);
+        P2shAddress address = service.findOne(addressId);
         if (address != null) {
             return new P2shAddressResourceAsm().toResource(address);
         }

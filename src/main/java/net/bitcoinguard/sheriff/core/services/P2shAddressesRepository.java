@@ -1,13 +1,15 @@
 package net.bitcoinguard.sheriff.core.services;
 
 import net.bitcoinguard.sheriff.core.entities.P2shAddress;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 /**
  * Created by Jiri on 7. 7. 2014.
  */
-public interface P2shAddressService {
-    P2shAddress find(Long id);
+@Repository
+public interface P2shAddressesRepository extends JpaRepository<P2shAddress, Long> {
     P2shAddress createNew(List<String> publicKeys);
 }

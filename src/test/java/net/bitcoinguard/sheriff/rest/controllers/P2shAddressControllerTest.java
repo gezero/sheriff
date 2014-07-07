@@ -2,7 +2,7 @@ package net.bitcoinguard.sheriff.rest.controllers;
 
 import net.bitcoinguard.sheriff.core.entities.P2shAddress;
 import net.bitcoinguard.sheriff.core.entities.RedeemScript;
-import net.bitcoinguard.sheriff.core.services.P2shAddressService;
+import net.bitcoinguard.sheriff.core.services.P2shAddressesRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -28,7 +28,7 @@ public class P2shAddressControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    P2shAddressService p2shAddressService;
+    P2shAddressesRepository p2shAddressesRepository;
 
     @Before
     public void setUp() {
@@ -45,7 +45,7 @@ public class P2shAddressControllerTest {
         RedeemScript script = new RedeemScript();
         address.setScript(script);
 
-        when(p2shAddressService.find(1L)).thenReturn(address);
+        when(p2shAddressesRepository.findOne(1L)).thenReturn(address);
 
         mockMvc.perform(get("/rest/addresses/1"))
                 .andExpect(status().isOk())
@@ -57,7 +57,7 @@ public class P2shAddressControllerTest {
     @Test
     public void testFindNonExistingAddress() throws Exception {
 
-        when(p2shAddressService.find(1L)).thenReturn(null);
+        when(p2shAddressesRepository.findOne(1L)).thenReturn(null);
 
         mockMvc.perform(get("/rest/addresses/1"))
                 .andExpect(status().isNotFound());
@@ -73,7 +73,7 @@ public class P2shAddressControllerTest {
         RedeemScript script = new RedeemScript();
         address.setScript(script);
 
-        when(p2shAddressService.createNew(Arrays.asList("key1", "key2"))).thenReturn(address);
+        when(p2shAddressesRepository.createNew(Arrays.asList("key1", "key2"))).thenReturn(address);
 
         mockMvc.perform(post("/rest/addresses")
                         .content("{\"keys\":[\"key1\",\"key2\"]}")

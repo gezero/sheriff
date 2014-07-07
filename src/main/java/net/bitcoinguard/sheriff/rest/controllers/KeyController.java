@@ -1,7 +1,7 @@
 package net.bitcoinguard.sheriff.rest.controllers;
 
 import net.bitcoinguard.sheriff.core.entities.Key;
-import net.bitcoinguard.sheriff.core.services.KeyService;
+import net.bitcoinguard.sheriff.core.services.KeysRepository;
 import net.bitcoinguard.sheriff.rest.entities.KeyResource;
 import net.bitcoinguard.sheriff.rest.entities.asm.KeyResourceAsm;
 import net.bitcoinguard.sheriff.rest.exceptions.NotFoundException;
@@ -16,15 +16,15 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/rest/keys")
 public class KeyController {
 
-    private KeyService keyService;
+    private KeysRepository keysRepository;
 
-    public KeyController(KeyService keyService) {
-        this.keyService = keyService;
+    public KeyController(KeysRepository keysRepository) {
+        this.keysRepository = keysRepository;
     }
 
     @RequestMapping(value = "/{keyId}", method = RequestMethod.GET)
     public @ResponseBody KeyResource getKey(@PathVariable Long keyId) {
-        Key key = keyService.find(keyId);
+        Key key = keysRepository.findOne(keyId);
 
         if (key != null) {
             KeyResource keyResource = new KeyResourceAsm().toResource(key); //todo: create bean out of this...

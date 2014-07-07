@@ -1,7 +1,7 @@
 package net.bitcoinguard.sheriff.rest.controllers;
 
 import net.bitcoinguard.sheriff.core.entities.Key;
-import net.bitcoinguard.sheriff.core.services.KeyService;
+import net.bitcoinguard.sheriff.core.services.KeysRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -26,7 +26,7 @@ public class KeyControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    KeyService keyService;
+    KeysRepository keysRepository;
 
     @Before
     public void setUp() {
@@ -41,7 +41,7 @@ public class KeyControllerTest {
         key.setPublicKey("public");
         key.setPrivateKey("private");
 
-        when(keyService.find(1L)).thenReturn(key);
+        when(keysRepository.findOne(1L)).thenReturn(key);
 
         mockMvc.perform(get("/rest/keys/1"))
                 .andDo(print())
@@ -53,7 +53,7 @@ public class KeyControllerTest {
     @Test
     public void getNonExistingKey() throws Exception {
 
-        when(keyService.find(1L)).thenReturn(null);
+        when(keysRepository.findOne(1L)).thenReturn(null);
 
         mockMvc.perform(get("/rest/keys/1"))
                 .andDo(print())
