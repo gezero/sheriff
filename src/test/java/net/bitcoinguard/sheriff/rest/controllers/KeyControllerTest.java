@@ -7,9 +7,7 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.hamcrest.Matchers.endsWith;
@@ -41,14 +39,14 @@ public class KeyControllerTest {
         Key key = new Key();
         key.setId(1L);
         key.setPublicKey("public");
-        key.setPrivatekey("private");
+        key.setPrivateKey("private");
 
         when(keyService.find(1L)).thenReturn(key);
 
         mockMvc.perform(get("/rest/keys/1"))
                 .andDo(print())
                 .andExpect(jsonPath("$.publicKey", is(key.getPublicKey())))
-                .andExpect(jsonPath("$.links[*].href",hasItem(endsWith("/keys/1"))))
+                .andExpect(jsonPath("$.links[*].href", hasItem(endsWith("/keys/1"))))
                 .andExpect(status().isOk());
     }
 

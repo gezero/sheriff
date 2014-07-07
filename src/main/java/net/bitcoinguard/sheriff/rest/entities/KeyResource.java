@@ -10,16 +10,6 @@ public class KeyResource extends ResourceSupport{
     private String publicKey;
     private String privateKey;
 
-    public KeyResource() {
-        //for serialization
-    }
-
-    public KeyResource(String publicKey, String privateKey) {
-
-        this.publicKey = publicKey;
-        this.privateKey = privateKey;
-    }
-
     public String getPublicKey() {
         return publicKey;
     }

@@ -9,9 +9,9 @@ import javax.persistence.Id;
  */
 @Entity
 public class Key {
-    Long id;
-    String publicKey;
-    String privatekey;
+    private Long id;
+    private String publicKey;
+    private String privateKey;
 
 
     @Id
@@ -31,11 +31,11 @@ public class Key {
         this.publicKey = publicKey;
     }
 
-    public String getPrivatekey() {
-        return privatekey;
+    public String getPrivateKey() {
+        return privateKey;
     }
 
-    public void setPrivatekey(String privatekey) {
-        this.privatekey = privatekey;
+    public void setPrivateKey(String privateKey) {
+        this.privateKey = privateKey;
     }
 }

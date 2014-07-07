@@ -27,7 +27,7 @@ public class KeyController {
         Key key = keyService.find(keyId);
 
         if (key != null) {
-            KeyResource keyResource = new KeyResourceAsm().toResource(key);
+            KeyResource keyResource = new KeyResourceAsm().toResource(key); //todo: create bean out of this...
 
             return keyResource;
         }
