@@ -1,6 +1,6 @@
 package net.bitcoinguard.sheriff.rest.controllers;
 
-import net.bitcoinguard.sheriff.core.entities.P2shAddressRename;
+import net.bitcoinguard.sheriff.core.entities.P2shAddress;
 import net.bitcoinguard.sheriff.core.entities.RedeemScript;
 import net.bitcoinguard.sheriff.core.services.P2shAddressService;
 import org.junit.Before;
@@ -36,7 +36,7 @@ public class P2shAddressControllerTest {
 
     @Test
     public void testFindExistingAddress() throws Exception {
-        P2shAddressRename address = new P2shAddressRename();
+        P2shAddress address = new P2shAddress();
         address.setId(1L);
         address.setAddress("testAddress");
         RedeemScript script = new RedeemScript();
