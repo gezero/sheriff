@@ -7,7 +7,7 @@ import javax.persistence.Id;
  * Created by Jiri on 7. 7. 2014.
  */
 @Entity
-public class P2shAddress {
+public class P2shAddressRename {
     private Long id;
     private String address;
     private RedeemScript script;
