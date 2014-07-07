@@ -16,6 +16,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -59,4 +60,23 @@ public class P2shAddressControllerTest {
                 .andExpect(status().isNotFound());
 
     }
+
+
+    @Test
+    public void testCreateNewAddress() throws Exception {
+        P2shAddress address = new P2shAddress();
+        address.setId(1L);
+        address.setAddress("testAddress");
+        RedeemScript script = new RedeemScript();
+        address.setScript(script);
+
+        when(p2shAddressService.createNew("key1","key2")).thenReturn(address);
+
+        mockMvc.perform(post("/rest/addresses").content("{'key1':'ke1', 'key2':'key2'}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.address", is("testAddress")))
+                .andExpect(jsonPath("$.links[*].href", hasItem(endsWith("/addresses/1"))));
+
+    }
+
 }
