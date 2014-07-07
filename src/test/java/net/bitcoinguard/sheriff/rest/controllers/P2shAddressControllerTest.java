@@ -51,4 +51,13 @@ public class P2shAddressControllerTest {
                 .andExpect(jsonPath("$.links[*].href", hasItem(endsWith("/addresses/1"))));
 
     }
+    @Test
+    public void testFindNonExistingAddress() throws Exception {
+
+        when(p2shAddressService.find(1L)).thenReturn(null);
+
+        mockMvc.perform(get("/rest/addresses/1"))
+                .andExpect(status().isNotFound());
+
+    }
 }
