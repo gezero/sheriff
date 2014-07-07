@@ -1,6 +1,10 @@
 package net.bitcoinguard.sheriff.rest.controllers;
 
+import net.bitcoinguard.sheriff.core.entities.Key;
+import net.bitcoinguard.sheriff.core.services.KeyService;
 import net.bitcoinguard.sheriff.rest.entities.KeyResource;
+import net.bitcoinguard.sheriff.rest.entities.asm.KeyResourceAsm;
+import net.bitcoinguard.sheriff.rest.exceptions.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,16 +13,24 @@ import org.springframework.web.bind.annotation.*;
  * Created by Jiri on 5. 7. 2014.
  */
 @Controller
-@RequestMapping("/keys")
+@RequestMapping("/rest/keys")
 public class KeyController {
 
-    @RequestMapping("/{publicKey}")
-    public @ResponseBody KeyResource getKey(@PathVariable String publicKey) {
-        return new KeyResource(publicKey, "private");
+    private KeyService keyService;
+
+    public KeyController(KeyService keyService) {
+        this.keyService = keyService;
     }
 
-    @RequestMapping(value="",method = RequestMethod.POST)
-    public @ResponseBody KeyResource storeKey(@RequestBody KeyResource key) {
-        return key;
+    @RequestMapping(value = "/{keyId}", method = RequestMethod.GET)
+    public @ResponseBody KeyResource getKey(@PathVariable Long keyId) {
+        Key key = keyService.find(keyId);
+
+        if (key != null) {
+            KeyResource keyResource = new KeyResourceAsm().toResource(key);
+
+            return keyResource;
+        }
+        throw new NotFoundException();
     }
 }

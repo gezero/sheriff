@@ -9,11 +9,20 @@ import javax.persistence.Id;
  */
 @Entity
 public class Key {
-
+    Long id;
     String publicKey;
     String privatekey;
 
+
     @Id
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getPublicKey() {
         return publicKey;
     }

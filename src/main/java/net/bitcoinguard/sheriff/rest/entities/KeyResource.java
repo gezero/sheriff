@@ -1,10 +1,12 @@
 package net.bitcoinguard.sheriff.rest.entities;
 
+import org.springframework.hateoas.ResourceSupport;
+
 /**
  * Key resource represents a key.
  * Created by Jiri on 5. 7. 2014.
  */
-public class KeyResource {
+public class KeyResource extends ResourceSupport{
     private String publicKey;
     private String privateKey;
 
