@@ -8,15 +8,17 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.is;
+import java.util.Arrays;
+
+import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -51,6 +53,7 @@ public class P2shAddressControllerTest {
                 .andExpect(jsonPath("$.links[*].href", hasItem(endsWith("/addresses/1"))));
 
     }
+
     @Test
     public void testFindNonExistingAddress() throws Exception {
 
@@ -70,9 +73,13 @@ public class P2shAddressControllerTest {
         RedeemScript script = new RedeemScript();
         address.setScript(script);
 
-        when(p2shAddressService.createNew("key1","key2")).thenReturn(address);
+        when(p2shAddressService.createNew(Arrays.asList("key1", "key2"))).thenReturn(address);
 
-        mockMvc.perform(post("/rest/addresses").content("{'key1':'ke1', 'key2':'key2'}"))
+        mockMvc.perform(post("/rest/addresses")
+                        .content("{\"keys\":[\"key1\",\"key2\"]}")
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.address", is("testAddress")))
                 .andExpect(jsonPath("$.links[*].href", hasItem(endsWith("/addresses/1"))));
