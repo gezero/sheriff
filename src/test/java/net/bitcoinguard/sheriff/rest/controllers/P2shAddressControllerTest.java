@@ -2,7 +2,6 @@ package net.bitcoinguard.sheriff.rest.controllers;
 
 import net.bitcoinguard.sheriff.core.entities.Key;
 import net.bitcoinguard.sheriff.core.entities.P2shAddress;
-import net.bitcoinguard.sheriff.core.entities.RedeemScript;
 import net.bitcoinguard.sheriff.core.services.KeysRepository;
 import net.bitcoinguard.sheriff.core.services.P2shAddressesRepository;
 import org.junit.Before;
@@ -12,7 +11,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -51,8 +49,7 @@ public class P2shAddressControllerTest {
         P2shAddress address = new P2shAddress();
         address.setId(1L);
         address.setAddress("testAddress");
-        RedeemScript script = new RedeemScript();
-        address.setScript(script);
+        address.setRedeemScript("redeemScript");
 
         when(p2shAddressesRepository.findOne(1L)).thenReturn(address);
 
@@ -79,8 +76,7 @@ public class P2shAddressControllerTest {
         P2shAddress address = new P2shAddress();
         address.setId(1L);
         address.setAddress("testAddress");
-        RedeemScript script = new RedeemScript();
-        address.setScript(script);
+        address.setRedeemScript("redeemScript");
         Key key = new Key();
         key.setPublicKey("testKey");
 
@@ -90,7 +86,7 @@ public class P2shAddressControllerTest {
         mockMvc.perform(post("/rest/addresses")
                         .content("{\"keys\":[\"key1\",\"key2\"],\"requiredKeys\":2, \"totalKeys\":3}")
                         .contentType(MediaType.APPLICATION_JSON)
-                )
+        )
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.address", is("testAddress")))
@@ -99,7 +95,7 @@ public class P2shAddressControllerTest {
         verify(p2shAddressesRepository).createNew(captor.capture());
 
         List<String> keys = captor.getValue();
-        assertThat(keys,contains("key1", "key2",key.getPublicKey()));
+        assertThat(keys, contains("key1", "key2", key.getPublicKey()));
 
     }
 

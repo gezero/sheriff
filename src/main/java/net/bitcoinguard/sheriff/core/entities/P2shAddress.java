@@ -2,6 +2,7 @@ package net.bitcoinguard.sheriff.core.entities;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import java.util.List;
 
 /**
  * Created by Jiri on 7. 7. 2014.
@@ -10,7 +11,8 @@ import javax.persistence.Id;
 public class P2shAddress {
     private Long id;
     private String address;
-    private RedeemScript script;
+    private String redeemScript;
+    private List<Key> keys;
 
     @Id
     public Long getId() {
@@ -29,11 +31,19 @@ public class P2shAddress {
         this.address = address;
     }
 
-    public RedeemScript getScript() {
-        return script;
+    public String getRedeemScript() {
+        return redeemScript;
     }
 
-    public void setScript(RedeemScript script) {
-        this.script = script;
+    public void setRedeemScript(String redeemScript) {
+        this.redeemScript = redeemScript;
+    }
+
+    public List<Key> getKeys() {
+        return keys;
+    }
+
+    public void setKeys(List<Key> keys) {
+        this.keys = keys;
     }
 }
