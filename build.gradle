@@ -35,8 +35,8 @@ dependencies {
     compile('com.h2database:h2:1.4.179')
     compile 'com.google:bitcoinj:0.12-SNAPSHOT'
     testCompile("org.springframework.boot:spring-boot-starter-test")
-//    testCompile('com.jayway.jsonpath:json-path:0.9.1')
-//    testCompile('com.jayway.jsonpath:json-path-assert:0.9.1')
+    testCompile('com.jayway.jsonpath:json-path:0.9.1')
+    testCompile('com.jayway.jsonpath:json-path-assert:0.9.1')
 }
 
 eclipse {

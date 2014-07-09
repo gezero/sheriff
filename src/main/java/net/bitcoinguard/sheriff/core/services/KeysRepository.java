@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface KeysRepository extends JpaRepository<Key, Long> {
+    Key generateNewKey();
 }
