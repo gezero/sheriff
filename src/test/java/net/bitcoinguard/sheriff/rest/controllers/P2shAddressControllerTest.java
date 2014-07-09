@@ -2,6 +2,7 @@ package net.bitcoinguard.sheriff.rest.controllers;
 
 import net.bitcoinguard.sheriff.core.entities.Key;
 import net.bitcoinguard.sheriff.core.entities.P2shAddress;
+import net.bitcoinguard.sheriff.core.entities.Transaction;
 import net.bitcoinguard.sheriff.core.services.KeysRepository;
 import net.bitcoinguard.sheriff.core.services.P2shAddressesRepository;
 import org.junit.Before;
@@ -107,6 +108,26 @@ public class P2shAddressControllerTest {
         )
                 .andDo(print())
                 .andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    public void testCreateTransaction() throws Exception{
+        Transaction transaction = new Transaction();
+        transaction.setTargetAddress("targetAddress");
+        transaction.setAmount(10000L);
+        transaction.setId(1L);
+        transaction.setRawTransaction("rawTransaction");
+
+        when(p2shAddressesRepository.createNewTransaction(transaction.getId(),transaction.getTargetAddress(),transaction.getAmount())).thenReturn(transaction);
+
+        mockMvc.perform(post("/rest/addresses/1")
+                        .content("{\"amount\":10000,\"targetAddress\":\"targetAddress\"}")
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.links[*].href", hasItem(endsWith("/transactions/1"))));
 
     }
 

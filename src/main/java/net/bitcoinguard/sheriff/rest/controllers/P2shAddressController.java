@@ -2,10 +2,13 @@ package net.bitcoinguard.sheriff.rest.controllers;
 
 import net.bitcoinguard.sheriff.core.entities.Key;
 import net.bitcoinguard.sheriff.core.entities.P2shAddress;
+import net.bitcoinguard.sheriff.core.entities.Transaction;
 import net.bitcoinguard.sheriff.core.services.KeysRepository;
 import net.bitcoinguard.sheriff.core.services.P2shAddressesRepository;
 import net.bitcoinguard.sheriff.rest.entities.P2shAddressResource;
+import net.bitcoinguard.sheriff.rest.entities.TransactionResource;
 import net.bitcoinguard.sheriff.rest.entities.asm.P2shAddressResourceAsm;
+import net.bitcoinguard.sheriff.rest.entities.asm.TransactionResourceAsm;
 import net.bitcoinguard.sheriff.rest.exceptions.NotFoundException;
 import net.bitcoinguard.sheriff.rest.exceptions.ToManyKeysException;
 import org.springframework.http.HttpHeaders;
@@ -58,5 +61,16 @@ public class P2shAddressController {
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create(p2shAddressResource.getLink("self").getHref()));
         return new ResponseEntity<>(p2shAddressResource, headers, HttpStatus.CREATED);
+    }
+
+    @RequestMapping(value = "/{addressId}", method = RequestMethod.POST)
+    public
+    @ResponseBody
+    ResponseEntity<TransactionResource> createTransaction(@PathVariable Long addressId, @RequestBody TransactionResource transactionResource) {
+        Transaction transaction = p2shAddressesRepository.createNewTransaction(addressId, transactionResource.getTargetAddress(), transactionResource.getAmount());
+        TransactionResource resource = new TransactionResourceAsm().toResource(transaction);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create(resource.getLink("self").getHref()));
+        return new ResponseEntity<>(resource,headers,HttpStatus.CREATED);
     }
 }

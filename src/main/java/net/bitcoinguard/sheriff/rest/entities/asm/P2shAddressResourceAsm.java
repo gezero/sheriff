@@ -26,8 +26,10 @@ public class P2shAddressResourceAsm extends ResourceAssemblerSupport<P2shAddress
         P2shAddressResource resource = new P2shAddressResource();
         resource.setAddress(entity.getAddress());
         resource.setRedeemScript(entity.getRedeemScript());
+        //todo: add keys
         Link link = linkTo(methodOn(P2shAddressController.class).getAddress(entity.getId())).withSelfRel();
         resource.add(link);
+        //todo: add links to other entities in address
         return resource;
     }
 }
