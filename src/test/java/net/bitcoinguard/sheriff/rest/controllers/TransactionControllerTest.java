@@ -1,7 +1,7 @@
 package net.bitcoinguard.sheriff.rest.controllers;
 
 import net.bitcoinguard.sheriff.core.entities.Transaction;
-import net.bitcoinguard.sheriff.core.services.TransactionsService;
+import net.bitcoinguard.sheriff.core.services.TransactionsRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -25,7 +25,7 @@ public class TransactionControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    TransactionsService transactionsService;
+    TransactionsRepository transactionsRepository;
 
     @Before
     public void setUp() {
@@ -41,7 +41,7 @@ public class TransactionControllerTest {
         transaction.setAmount(100000L);
 
 
-        when(transactionsService.findOne(1L)).thenReturn(transaction);
+        when(transactionsRepository.findOne(1L)).thenReturn(transaction);
 
         mockMvc.perform(get("/rest/transactions/1"))
                 .andDo(print())
@@ -53,7 +53,7 @@ public class TransactionControllerTest {
     @Test
     public void testFindNonExistingAddress() throws Exception {
 
-        when(transactionsService.findOne(1L)).thenReturn(null);
+        when(transactionsRepository.findOne(1L)).thenReturn(null);
 
         mockMvc.perform(get("/rest/transactions/1"))
                 .andExpect(status().isNotFound());

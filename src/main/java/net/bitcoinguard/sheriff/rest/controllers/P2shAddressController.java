@@ -3,7 +3,7 @@ package net.bitcoinguard.sheriff.rest.controllers;
 import net.bitcoinguard.sheriff.core.entities.Key;
 import net.bitcoinguard.sheriff.core.entities.P2shAddress;
 import net.bitcoinguard.sheriff.core.entities.Transaction;
-import net.bitcoinguard.sheriff.core.services.KeysRepository;
+import net.bitcoinguard.sheriff.core.services.KeysRepositoryCustom;
 import net.bitcoinguard.sheriff.core.services.P2shAddressesRepository;
 import net.bitcoinguard.sheriff.rest.entities.P2shAddressResource;
 import net.bitcoinguard.sheriff.rest.entities.TransactionResource;
@@ -11,6 +11,7 @@ import net.bitcoinguard.sheriff.rest.entities.asm.P2shAddressResourceAsm;
 import net.bitcoinguard.sheriff.rest.entities.asm.TransactionResourceAsm;
 import net.bitcoinguard.sheriff.rest.exceptions.NotFoundException;
 import net.bitcoinguard.sheriff.rest.exceptions.ToManyKeysException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,9 +27,10 @@ import java.net.URI;
 @RequestMapping("/rest/addresses")
 public class P2shAddressController {
     P2shAddressesRepository p2shAddressesRepository;
-    KeysRepository keysRepository;
+    KeysRepositoryCustom keysRepository;
 
-    public P2shAddressController(P2shAddressesRepository p2shAddressesRepository, KeysRepository keysRepository) {
+    @Autowired
+    public P2shAddressController(P2shAddressesRepository p2shAddressesRepository, KeysRepositoryCustom keysRepository) {
         this.p2shAddressesRepository = p2shAddressesRepository;
         this.keysRepository = keysRepository;
 
@@ -38,7 +40,7 @@ public class P2shAddressController {
     public
     @ResponseBody
     P2shAddressResource getAddress(@PathVariable String addressId) {
-        P2shAddress address = p2shAddressesRepository.findOne(addressId);
+        P2shAddress address = p2shAddressesRepository.findByAddress(addressId);
         if (address != null) {
             return new P2shAddressResourceAsm().toResource(address);
         }

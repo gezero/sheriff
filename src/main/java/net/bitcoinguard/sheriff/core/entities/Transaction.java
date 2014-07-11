@@ -1,8 +1,12 @@
 package net.bitcoinguard.sheriff.core.entities;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
 /**
  * Created by Jiri on 9. 7. 2014.
  */
+@Entity
 public class Transaction {
     Long id;
     String rawTransaction;
@@ -10,6 +14,7 @@ public class Transaction {
     private String targetAddress;
     private String sourceAddrees;
 
+    @Id
     public Long getId() {
         return id;
     }

@@ -2,6 +2,8 @@ package net.bitcoinguard.sheriff.core.entities;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import java.util.List;
 
 /**
@@ -39,6 +41,8 @@ public class P2shAddress {
         this.redeemScript = redeemScript;
     }
 
+    @ManyToMany
+    @JoinTable(name="ADDRESS_KEYS")
     public List<Key> getKeys() {
         return keys;
     }

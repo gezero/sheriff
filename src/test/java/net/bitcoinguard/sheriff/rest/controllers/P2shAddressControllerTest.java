@@ -3,7 +3,7 @@ package net.bitcoinguard.sheriff.rest.controllers;
 import net.bitcoinguard.sheriff.core.entities.Key;
 import net.bitcoinguard.sheriff.core.entities.P2shAddress;
 import net.bitcoinguard.sheriff.core.entities.Transaction;
-import net.bitcoinguard.sheriff.core.services.KeysRepository;
+import net.bitcoinguard.sheriff.core.services.KeysRepositoryCustom;
 import net.bitcoinguard.sheriff.core.services.P2shAddressesRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +33,7 @@ public class P2shAddressControllerTest {
     @Mock
     P2shAddressesRepository p2shAddressesRepository;
     @Mock
-    KeysRepository keysRepository;
+    KeysRepositoryCustom keysRepository;
 
     @Captor
     ArgumentCaptor<List<String>> captor;
@@ -52,7 +52,7 @@ public class P2shAddressControllerTest {
         address.setAddress("testAddress");
         address.setRedeemScript("redeemScript");
 
-        when(p2shAddressesRepository.findOne("testAddress")).thenReturn(address);
+        when(p2shAddressesRepository.findByAddress("testAddress")).thenReturn(address);
 
         mockMvc.perform(get("/rest/addresses/testAddress"))
                 .andExpect(status().isOk())
@@ -64,7 +64,7 @@ public class P2shAddressControllerTest {
     @Test
     public void testFindNonExistingAddress() throws Exception {
 
-        when(p2shAddressesRepository.findOne("notExistingAddress")).thenReturn(null);
+        when(p2shAddressesRepository.findByAddress("notExistingAddress")).thenReturn(null);
 
         mockMvc.perform(get("/rest/addresses/1"))
                 .andExpect(status().isNotFound());

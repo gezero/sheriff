@@ -10,12 +10,9 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -41,7 +38,7 @@ public class KeyControllerTest {
         key.setPublicKey("testABC");
         key.setPrivateKey("private");
 
-        when(keysRepository.findOne("testABC")).thenReturn(key);
+        when(keysRepository.findByPublicKey("testABC")).thenReturn(key);
 
         mockMvc.perform(get("/rest/keys/testABC"))
                 .andDo(print())
@@ -53,7 +50,7 @@ public class KeyControllerTest {
     @Test
     public void getNonExistingKey() throws Exception {
 
-        when(keysRepository.findOne("nonExistingKey")).thenReturn(null);
+        when(keysRepository.findByPublicKey("nonExistingKey")).thenReturn(null);
 
         mockMvc.perform(get("/rest/keys/1"))
                 .andDo(print())
