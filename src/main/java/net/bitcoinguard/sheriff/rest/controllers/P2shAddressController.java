@@ -62,7 +62,7 @@ public class P2shAddressController {
             Key key = keysRepository.generateNewKey();
             newAddress.getKeys().add(key.getPublicKey());
         }
-        P2shAddress address = p2shAddressesRepository.createNew(newAddress.getKeys(), 0);
+        P2shAddress address = p2shAddressesRepository.createNew(newAddress.getKeys(), newAddress.getRequiredKeys());
         P2shAddressResource p2shAddressResource = new P2shAddressResourceAsm().toResource(address);
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create(p2shAddressResource.getLink("self").getHref()));

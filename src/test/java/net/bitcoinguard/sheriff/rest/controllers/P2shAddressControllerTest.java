@@ -14,8 +14,13 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
+import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -82,7 +87,7 @@ public class P2shAddressControllerTest {
         key.setPublicKey("testKey");
 
         when(keysRepository.generateNewKey()).thenReturn(key);
-        when(p2shAddressesRepository.createNew(anyList(), 0)).thenReturn(address);
+        when(p2shAddressesRepository.createNew(anyList(), any(Integer.class))).thenReturn(address);
 
         mockMvc.perform(post("/rest/addresses")
                         .content("{\"keys\":[\"key1\",\"key2\"],\"requiredKeys\":2, \"totalKeys\":3}")
@@ -93,7 +98,7 @@ public class P2shAddressControllerTest {
                 .andExpect(jsonPath("$.address", is("testAddress")))
                 .andExpect(jsonPath("$.links[*].href", hasItem(endsWith("/addresses/testAddress"))));
 
-        verify(p2shAddressesRepository).createNew(captor.capture(), 0);
+        verify(p2shAddressesRepository).createNew(captor.capture(), anyInt());
 
         List<String> keys = captor.getValue();
         assertThat(keys, contains("key1", "key2", key.getPublicKey()));
