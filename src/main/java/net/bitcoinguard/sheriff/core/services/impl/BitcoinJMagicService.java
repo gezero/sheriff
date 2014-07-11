@@ -1,5 +1,6 @@
 package net.bitcoinguard.sheriff.core.services.impl;
 
+import com.google.bitcoin.core.Base58;
 import com.google.bitcoin.core.ECKey;
 import com.google.bitcoin.core.Utils;
 import com.google.bitcoin.script.Script;
@@ -7,10 +8,7 @@ import com.google.bitcoin.script.ScriptBuilder;
 import net.bitcoinguard.sheriff.core.services.BitcoinMagicService;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Jiri on 11. 7. 2014.
@@ -24,7 +22,7 @@ public class BitcoinJMagicService implements BitcoinMagicService {
         for (String publicKey : publicKeys) {
             keys.add(ECKey.fromPublicOnly(Utils.HEX.decode(publicKey)));
         }
-        Script script = ScriptBuilder.createMultiSigOutputScript(requiredKeys,keys);
+        Script script = ScriptBuilder.createMultiSigOutputScript(requiredKeys, keys);
         return Utils.HEX.encode(script.getProgram());
     }
 
@@ -38,12 +36,16 @@ public class BitcoinJMagicService implements BitcoinMagicService {
     }
 
     @Override
-    public String getHashOfScript(String redeemScript) {
-        return null;
-    }
-
-    @Override
     public String getAddressFromRedeemScript(String multiSignatureRedeemScript) {
-        return null;
+        Script script = new Script(Utils.HEX.decode(multiSignatureRedeemScript));
+        byte[] sha256hash160 = Utils.sha256hash160(script.getProgram());
+        byte[] bytes = new byte[sha256hash160.length+1];
+        bytes[0]= -60;
+        System.arraycopy(sha256hash160,0,bytes,1,sha256hash160.length);
+        byte[] checkSum = Utils.doubleDigest(bytes);
+        byte[] address = new byte[bytes.length + 4];
+        System.arraycopy(bytes,0,address,0,bytes.length);
+        System.arraycopy(checkSum,0,address,bytes.length,4);
+        return Base58.encode(address);
     }
 }

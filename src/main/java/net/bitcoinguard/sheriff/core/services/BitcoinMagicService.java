@@ -23,7 +23,5 @@ public interface BitcoinMagicService {
 
     Map<String, String> generateKeyPair();
 
-    String getHashOfScript(String redeemScript);
-
     String getAddressFromRedeemScript(String multiSignatureRedeemScript);
 }

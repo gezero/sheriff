@@ -80,7 +80,8 @@ public class BitcoinJMagicServiceTest {
         Script script = new Script(Utils.HEX.decode(multiSignatureRedeemScript));
 
         byte[] scriptHash = Utils.sha256hash160(script.getProgram()); //we create the hash of the script
-        byte[] addressDecoded = Utils.parseAsHexOrBase58(bitcoinJMagicService.getAddressFromRedeemScript(multiSignatureRedeemScript));  //we decode the address provided
+        String address = bitcoinJMagicService.getAddressFromRedeemScript(multiSignatureRedeemScript);
+        byte[] addressDecoded = Utils.parseAsHexOrBase58(address);  //we decode the address provided
         byte firstByteOfAddress = -60; //This is the number 3 in normal addresses but is 2 in testnet that prefix the address
         byte[] addressWithoutFirstByte = Arrays.copyOfRange(addressDecoded, 1, addressDecoded.length);  //we take out the first character so that we can compare the hash
 

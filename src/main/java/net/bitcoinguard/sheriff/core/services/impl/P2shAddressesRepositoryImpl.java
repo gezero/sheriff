@@ -25,7 +25,7 @@ public class P2shAddressesRepositoryImpl implements P2shAddressesRepositoryCusto
     public P2shAddress createNew(List<String> publicKeys, Integer requiredKeys) {
         P2shAddress address = new P2shAddress();
         address.setRedeemScript(bitcoinMagicService.createMultiSignatureRedeemScript(publicKeys,requiredKeys));
-        address.setAddress(bitcoinMagicService.getHashOfScript(address.getRedeemScript()));
+        address.setAddress(bitcoinMagicService.getAddressFromRedeemScript(address.getRedeemScript()));
         return address;
     }
 
