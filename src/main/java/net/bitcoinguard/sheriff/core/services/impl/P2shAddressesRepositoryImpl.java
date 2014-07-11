@@ -1,12 +1,15 @@
 package net.bitcoinguard.sheriff.core.services.impl;
 
+import net.bitcoinguard.sheriff.core.entities.Key;
 import net.bitcoinguard.sheriff.core.entities.P2shAddress;
 import net.bitcoinguard.sheriff.core.entities.Transaction;
 import net.bitcoinguard.sheriff.core.services.BitcoinMagicService;
+import net.bitcoinguard.sheriff.core.services.KeysRepository;
 import net.bitcoinguard.sheriff.core.services.P2shAddressesRepositoryCustom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,10 +18,12 @@ import java.util.List;
 @Service
 public class P2shAddressesRepositoryImpl implements P2shAddressesRepositoryCustom {
     BitcoinMagicService bitcoinMagicService;
+    KeysRepository keysRepository;
 
     @Autowired
-    public P2shAddressesRepositoryImpl(BitcoinMagicService bitcoinMagicService) {
+    public P2shAddressesRepositoryImpl(BitcoinMagicService bitcoinMagicService,KeysRepository keysRepository) {
         this.bitcoinMagicService = bitcoinMagicService;
+        this.keysRepository = keysRepository;
     }
 
     @Override
@@ -26,6 +31,13 @@ public class P2shAddressesRepositoryImpl implements P2shAddressesRepositoryCusto
         P2shAddress address = new P2shAddress();
         address.setRedeemScript(bitcoinMagicService.createMultiSignatureRedeemScript(publicKeys,requiredKeys));
         address.setAddress(bitcoinMagicService.getAddressFromRedeemScript(address.getRedeemScript()));
+        List<Key> keys = new ArrayList<>(publicKeys.size());
+        for (String publicKey : publicKeys) {
+            Key key = new Key();
+            key.setPublicKey(publicKey);
+            keys.add(key);
+        }
+        address.setKeys(keys);
         return address;
     }
 

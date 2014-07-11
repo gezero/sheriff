@@ -1,7 +1,9 @@
 package net.bitcoinguard.sheriff.core.services.impl;
 
+import net.bitcoinguard.sheriff.core.entities.Key;
 import net.bitcoinguard.sheriff.core.entities.P2shAddress;
 import net.bitcoinguard.sheriff.core.services.BitcoinMagicService;
+import net.bitcoinguard.sheriff.core.services.KeysRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -11,7 +13,7 @@ import org.mockito.MockitoAnnotations;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
@@ -21,6 +23,8 @@ public class P2shAddressesRepositoryImplTest {
 
     @Mock
     BitcoinMagicService bitcoinMagicService;
+    @Mock
+    KeysRepository keysRepository;
 
     @Before
     public void setUp(){
@@ -39,5 +43,9 @@ public class P2shAddressesRepositoryImplTest {
         P2shAddress address = addressesRepository.createNew(keys, 2);
         assertThat(address.getRedeemScript(),is("redeemScript"));
         assertThat(address.getAddress(),is("address"));
+        List<Key> addressKeys = address.getKeys();
+        for (Key addressKey : addressKeys) {
+            assertThat(keys,hasItem(addressKey.getPublicKey()));
+        }
     }
 }

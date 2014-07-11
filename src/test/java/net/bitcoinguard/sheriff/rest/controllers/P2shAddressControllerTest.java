@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.endsWith;
@@ -43,25 +44,39 @@ public class P2shAddressControllerTest {
     @Captor
     ArgumentCaptor<List<String>> captor;
 
+    P2shAddress testAddress;
+    Key testKey;
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         mockMvc = MockMvcBuilders.standaloneSetup(p2shAddressController).build();
     }
 
+    @Before
+    public void initTestEntities(){
+        testAddress = new P2shAddress();
+        testAddress.setId(1L);
+        testAddress.setAddress("testAddress");
+        testAddress.setRedeemScript("redeemScript");
+        List<Key> returnKeys = new ArrayList<>();
+        testAddress.setKeys(returnKeys);
+        testKey = new Key();
+        testKey.setPublicKey("testKey");
+        returnKeys.add(testKey);
+
+    }
+
+
 
     @Test
     public void testFindExistingAddress() throws Exception {
-        P2shAddress address = new P2shAddress();
-        address.setId(1L);
-        address.setAddress("testAddress");
-        address.setRedeemScript("redeemScript");
 
-        when(p2shAddressesRepository.findByAddress("testAddress")).thenReturn(address);
+        when(p2shAddressesRepository.findByAddress("testAddress")).thenReturn(testAddress);
 
         mockMvc.perform(get("/rest/addresses/testAddress"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.address", is(address.getAddress())))
+                .andExpect(jsonPath("$.address", is(testAddress.getAddress())))
                 .andExpect(jsonPath("$.links[*].href", hasItem(endsWith("/addresses/testAddress"))));
 
     }
@@ -79,15 +94,9 @@ public class P2shAddressControllerTest {
 
     @Test
     public void testCreateNewAddress() throws Exception {
-        P2shAddress address = new P2shAddress();
-        address.setId(1L);
-        address.setAddress("testAddress");
-        address.setRedeemScript("redeemScript");
-        Key key = new Key();
-        key.setPublicKey("testKey");
 
-        when(keysRepository.generateNewKey()).thenReturn(key);
-        when(p2shAddressesRepository.createNew(anyList(), any(Integer.class))).thenReturn(address);
+        when(keysRepository.generateNewKey()).thenReturn(testKey);
+        when(p2shAddressesRepository.createNew(anyList(), any(Integer.class))).thenReturn(testAddress);
 
         mockMvc.perform(post("/rest/addresses")
                         .content("{\"keys\":[\"key1\",\"key2\"],\"requiredKeys\":2, \"totalKeys\":3}")
@@ -96,12 +105,13 @@ public class P2shAddressControllerTest {
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.address", is("testAddress")))
+                .andExpect(jsonPath("$.keys[*]", hasItem("testKey")))
                 .andExpect(jsonPath("$.links[*].href", hasItem(endsWith("/addresses/testAddress"))));
 
         verify(p2shAddressesRepository).createNew(captor.capture(), anyInt());
 
         List<String> keys = captor.getValue();
-        assertThat(keys, contains("key1", "key2", key.getPublicKey()));
+        assertThat(keys, contains("key1", "key2", testKey.getPublicKey()));
 
     }
 
