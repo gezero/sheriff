@@ -52,10 +52,10 @@ public class P2shAddressController {
     public
     @ResponseBody
     ResponseEntity<P2shAddressResource> createNewAddress(@RequestBody P2shAddressResource newAddress) {
-        if (newAddress.getKeys() == null){
+        if (newAddress.getKeys() == null) {
             throw new NoKeysProvidedException();
         }
-        if (newAddress.getKeys().size() >= newAddress.getTotalKeys()) {
+        if ( newAddress.getKeys().size() >= newAddress.getTotalKeys()) {
             throw new ToManyKeysException();
         }
         for (int i = newAddress.getKeys().size(); i < newAddress.getTotalKeys(); i++) {
@@ -77,6 +77,6 @@ public class P2shAddressController {
         TransactionResource resource = new TransactionResourceAsm().toResource(transaction);
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create(resource.getLink("self").getHref()));
-        return new ResponseEntity<>(resource,headers,HttpStatus.CREATED);
+        return new ResponseEntity<>(resource, headers, HttpStatus.CREATED);
     }
 }

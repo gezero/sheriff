@@ -1,7 +1,5 @@
 package net.bitcoinguard.sheriff.rest.entities;
 
-import net.bitcoinguard.sheriff.core.entities.P2shAddress;
-import net.bitcoinguard.sheriff.core.entities.RedeemScript;
 import org.springframework.hateoas.ResourceSupport;
 
 import java.util.List;
@@ -12,8 +10,8 @@ import java.util.List;
 public class P2shAddressResource extends ResourceSupport {
     String address;
     String redeemScript;
-    Integer totalKeys;
-    Integer requiredKeys;
+    Integer totalKeys = 3;
+    Integer requiredKeys = 2;
     List<String> keys;
 
     public String getAddress() {
