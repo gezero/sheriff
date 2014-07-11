@@ -128,7 +128,17 @@ public class P2shAddressControllerTest {
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.links[*].href", hasItem(endsWith("/transactions/1"))));
+    }
 
+    @Test
+    public void testNothingInRequest() throws Exception {
+        mockMvc
+                .perform(post("/rest/addresses")
+                                .content("{}")
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest());
     }
 
 }

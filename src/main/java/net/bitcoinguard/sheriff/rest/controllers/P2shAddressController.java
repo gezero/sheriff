@@ -9,6 +9,7 @@ import net.bitcoinguard.sheriff.rest.entities.P2shAddressResource;
 import net.bitcoinguard.sheriff.rest.entities.TransactionResource;
 import net.bitcoinguard.sheriff.rest.entities.asm.P2shAddressResourceAsm;
 import net.bitcoinguard.sheriff.rest.entities.asm.TransactionResourceAsm;
+import net.bitcoinguard.sheriff.rest.exceptions.NoKeysProvidedException;
 import net.bitcoinguard.sheriff.rest.exceptions.NotFoundException;
 import net.bitcoinguard.sheriff.rest.exceptions.ToManyKeysException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,9 @@ public class P2shAddressController {
     public
     @ResponseBody
     ResponseEntity<P2shAddressResource> createNewAddress(@RequestBody P2shAddressResource newAddress) {
+        if (newAddress.getKeys() == null){
+            throw new NoKeysProvidedException();
+        }
         if (newAddress.getKeys().size() >= newAddress.getTotalKeys()) {
             throw new ToManyKeysException();
         }
