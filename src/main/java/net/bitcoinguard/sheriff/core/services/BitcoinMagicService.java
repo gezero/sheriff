@@ -22,4 +22,6 @@ public interface BitcoinMagicService {
     String createMultiSignatureRedeemScript(List<String> publicKeys, int requiredKeys);
 
     Map<String, String> generateKeyPair();
+
+    String getHashOfScript(String redeemScript);
 }

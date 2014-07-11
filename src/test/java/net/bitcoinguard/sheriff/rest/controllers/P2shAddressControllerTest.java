@@ -82,7 +82,7 @@ public class P2shAddressControllerTest {
         key.setPublicKey("testKey");
 
         when(keysRepository.generateNewKey()).thenReturn(key);
-        when(p2shAddressesRepository.createNew(anyList())).thenReturn(address);
+        when(p2shAddressesRepository.createNew(anyList(), 0)).thenReturn(address);
 
         mockMvc.perform(post("/rest/addresses")
                         .content("{\"keys\":[\"key1\",\"key2\"],\"requiredKeys\":2, \"totalKeys\":3}")
@@ -93,7 +93,7 @@ public class P2shAddressControllerTest {
                 .andExpect(jsonPath("$.address", is("testAddress")))
                 .andExpect(jsonPath("$.links[*].href", hasItem(endsWith("/addresses/testAddress"))));
 
-        verify(p2shAddressesRepository).createNew(captor.capture());
+        verify(p2shAddressesRepository).createNew(captor.capture(), 0);
 
         List<String> keys = captor.getValue();
         assertThat(keys, contains("key1", "key2", key.getPublicKey()));

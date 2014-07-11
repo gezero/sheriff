@@ -27,4 +27,9 @@ public class BitcoinJMagicService implements BitcoinMagicService {
         map.put(PRIVATE_KEY, Utils.HEX.encode(key.getPrivKeyBytes()));
         return map;
     }
+
+    @Override
+    public String getHashOfScript(String redeemScript) {
+        return null;
+    }
 }
