@@ -37,7 +37,7 @@ public class P2shAddressController {
     @RequestMapping(value = "/{addressId}", method = RequestMethod.GET)
     public
     @ResponseBody
-    P2shAddressResource getAddress(@PathVariable Long addressId) {
+    P2shAddressResource getAddress(@PathVariable String addressId) {
         P2shAddress address = p2shAddressesRepository.findOne(addressId);
         if (address != null) {
             return new P2shAddressResourceAsm().toResource(address);

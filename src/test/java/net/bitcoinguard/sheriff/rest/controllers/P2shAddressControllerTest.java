@@ -52,19 +52,19 @@ public class P2shAddressControllerTest {
         address.setAddress("testAddress");
         address.setRedeemScript("redeemScript");
 
-        when(p2shAddressesRepository.findOne(1L)).thenReturn(address);
+        when(p2shAddressesRepository.findOne("testAddress")).thenReturn(address);
 
-        mockMvc.perform(get("/rest/addresses/1"))
+        mockMvc.perform(get("/rest/addresses/testAddress"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.address", is("testAddress")))
-                .andExpect(jsonPath("$.links[*].href", hasItem(endsWith("/addresses/1"))));
+                .andExpect(jsonPath("$.address", is(address.getAddress())))
+                .andExpect(jsonPath("$.links[*].href", hasItem(endsWith("/addresses/testAddress"))));
 
     }
 
     @Test
     public void testFindNonExistingAddress() throws Exception {
 
-        when(p2shAddressesRepository.findOne(1L)).thenReturn(null);
+        when(p2shAddressesRepository.findOne("notExistingAddress")).thenReturn(null);
 
         mockMvc.perform(get("/rest/addresses/1"))
                 .andExpect(status().isNotFound());
@@ -91,7 +91,7 @@ public class P2shAddressControllerTest {
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.address", is("testAddress")))
-                .andExpect(jsonPath("$.links[*].href", hasItem(endsWith("/addresses/1"))));
+                .andExpect(jsonPath("$.links[*].href", hasItem(endsWith("/addresses/testAddress"))));
 
         verify(p2shAddressesRepository).createNew(captor.capture());
 

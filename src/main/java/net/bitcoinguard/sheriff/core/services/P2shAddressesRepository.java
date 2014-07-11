@@ -11,8 +11,10 @@ import java.util.List;
  * Created by Jiri on 7. 7. 2014.
  */
 @Repository
-public interface P2shAddressesRepository extends JpaRepository<P2shAddress, Long> {
+public interface P2shAddressesRepository {
     P2shAddress createNew(List<String> publicKeys);
 
     Transaction createNewTransaction(Long addressId, String targetAddress, Long amount);
+
+    P2shAddress findOne(String testAddress);
 }
