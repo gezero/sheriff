@@ -8,7 +8,6 @@ import java.util.Map;
 /**
  * Created by Jiri on 9. 7. 2014.
  */
-@Service
 public interface BitcoinMagicService {
     public static String PUBLIC_KEY = "publicKey";
     public static String PRIVATE_KEY = "privateKey";
