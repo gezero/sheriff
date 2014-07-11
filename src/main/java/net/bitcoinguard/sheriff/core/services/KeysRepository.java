@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
  * Created by Jiri on 7. 7. 2014.
  */
 @Repository
-public interface KeysRepository extends JpaRepository<Key, Long> {
+public interface KeysRepository {
     Key generateNewKey();
+
+    Key findOne(String publicKey);
 }

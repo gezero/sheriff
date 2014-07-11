@@ -25,7 +25,7 @@ public class KeyResourceAsm extends ResourceAssemblerSupport<Key, KeyResource> {
         KeyResource resource = new KeyResource();
         resource.setPublicKey(entity.getPublicKey());
         resource.setPrivateKey(entity.getPrivateKey());
-        Link link = linkTo(methodOn(KeyController.class).getKey(entity.getId())).withSelfRel();
+        Link link = linkTo(methodOn(KeyController.class).getKey(entity.getPublicKey())).withSelfRel();
         resource.add(link);
         return resource;
     }

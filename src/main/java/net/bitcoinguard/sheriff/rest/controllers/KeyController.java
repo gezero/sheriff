@@ -22,14 +22,12 @@ public class KeyController {
         this.keysRepository = keysRepository;
     }
 
-    @RequestMapping(value = "/{keyId}", method = RequestMethod.GET)
-    public @ResponseBody KeyResource getKey(@PathVariable Long keyId) {
-        Key key = keysRepository.findOne(keyId);
+    @RequestMapping(value = "/{publicKey}", method = RequestMethod.GET)
+    public @ResponseBody KeyResource getKey(@PathVariable String publicKey) {
+        Key key = keysRepository.findOne(publicKey);
 
         if (key != null) {
-            KeyResource keyResource = new KeyResourceAsm().toResource(key); //todo: create bean out of this...
-
-            return keyResource;
+            return new KeyResourceAsm().toResource(key);
         }
         throw new NotFoundException();
     }

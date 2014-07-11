@@ -38,22 +38,22 @@ public class KeyControllerTest {
     public void getExistingKey() throws Exception {
         Key key = new Key();
         key.setId(1L);
-        key.setPublicKey("public");
+        key.setPublicKey("testABC");
         key.setPrivateKey("private");
 
-        when(keysRepository.findOne(1L)).thenReturn(key);
+        when(keysRepository.findOne("testABC")).thenReturn(key);
 
-        mockMvc.perform(get("/rest/keys/1"))
+        mockMvc.perform(get("/rest/keys/testABC"))
                 .andDo(print())
                 .andExpect(jsonPath("$.publicKey", is(key.getPublicKey())))
-                .andExpect(jsonPath("$.links[*].href", hasItem(endsWith("/keys/1"))))
+                .andExpect(jsonPath("$.links[*].href", hasItem(endsWith("/keys/testABC"))))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void getNonExistingKey() throws Exception {
 
-        when(keysRepository.findOne(1L)).thenReturn(null);
+        when(keysRepository.findOne("nonExistingKey")).thenReturn(null);
 
         mockMvc.perform(get("/rest/keys/1"))
                 .andDo(print())
