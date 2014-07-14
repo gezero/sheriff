@@ -1,26 +1,39 @@
 package net.bitcoinguard.endtoend;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.bitcoin.core.ECKey;
 import com.google.bitcoin.core.Utils;
 import net.bitcoinguard.sheriff.Application;
 import net.bitcoinguard.sheriff.rest.controllers.P2shAddressController;
 import net.bitcoinguard.sheriff.rest.entities.P2shAddressResource;
 import net.bitcoinguard.sheriff.rest.entities.TransactionResource;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Created by Jiri on 11. 7. 2014.
@@ -30,19 +43,43 @@ import static org.hamcrest.Matchers.not;
 @WebAppConfiguration
 public class AddressTest {
     @Autowired
+    private WebApplicationContext context;
+    MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper mapper;
+
+    @Autowired
     private P2shAddressController p2shAddressController;
 
+    @Before
+    public void setUp() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
+    }
 
     @Test
     public void createNewAddress() throws Exception {
-        P2shAddressResource request = addressRequest();
+        P2shAddressResource requestAddress = addressRequest();
 
-        ResponseEntity<P2shAddressResource> responseEntity = p2shAddressController.createNewAddress(request);
-        P2shAddressResource response = responseEntity.getBody();
+        mockMvc.perform(post("/rest/addresses")
+                        .content(prepareRequest(requestAddress))
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.address", is(any(String.class))))
+                .andExpect(jsonPath("$.keys[*]", hasItem(requestAddress.getKeys().get(0))))
+                .andExpect(jsonPath("$.keys[*]", hasItem(requestAddress.getKeys().get(1))))
+                .andExpect(jsonPath("$.totalKeys", is(3)))
+                .andExpect(jsonPath("$.requiredKeys", is(2)))
+                .andExpect(jsonPath("$.links[*].href", hasItem(containsString("/addresses/"))));
 
-        assertThat(response.getTotalKeys(), is(3));
-        assertThat(response.getRequiredKeys(), is(2));
-        assertThat(response.getKeys(), hasItems(request.getKeys().get(0), request.getKeys().get(1)));
+    }
+
+    private String prepareRequest(Object request) throws IOException {
+        StringWriter writer = new StringWriter();
+        mapper.writeValue(writer, request);
+        return writer.toString();
     }
 
     private P2shAddressResource addressRequest() {
@@ -58,26 +95,40 @@ public class AddressTest {
     }
 
     @Test
-    public void createNewTransaction() throws Exception{
+    public void createNewTransaction() throws Exception {
         P2shAddressResource request = addressRequest();
 
-        ResponseEntity<P2shAddressResource> responseEntity = p2shAddressController.createNewAddress(request);
-        P2shAddressResource address1 = responseEntity.getBody();
+        MvcResult mvcResult = mockMvc.perform(post("/rest/addresses")
+                        .content(prepareRequest(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andReturn();
+
+        P2shAddressResource address1 = getContent(mvcResult,P2shAddressResource.class);
 
         request = addressRequest();
-        responseEntity = p2shAddressController.createNewAddress(request);
-        P2shAddressResource address2 = responseEntity.getBody();
+        mvcResult = mockMvc.perform(post("/rest/addresses")
+                        .content(prepareRequest(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andReturn();
+        P2shAddressResource address2 = getContent(mvcResult,P2shAddressResource.class);
 
-        assertThat(address1.getAddress(),is(not(address2.getAddress())));
+        assertThat(address1.getAddress(), is(not(address2.getAddress())));
 
-        TransactionResource transactionResource = new TransactionResource();
-        transactionResource.setTargetAddress(address2.getAddress());
-        transactionResource.setAmount(1000L);
-        ResponseEntity<TransactionResource> transactionResponse = p2shAddressController.createTransaction(address1.getAddress(), transactionResource);
+        TransactionResource transactionRequest = new TransactionResource();
+        transactionRequest.setTargetAddress(address2.getAddress());
+        transactionRequest.setAmount(1000L);
+        mvcResult = mockMvc.perform(post("/rest/addresses/"+address1.getAddress()+"/transactions")
+                        .content(prepareRequest(transactionRequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andReturn();
 
-        TransactionResource transaction = transactionResponse.getBody();
-        assertThat(transaction.getAmount(),is(transactionResource.getAmount()));
-        assertThat(transaction.getSourceAddress(),is(address1.getAddress()));
-        assertThat(transaction.getTargetAddress(),is(address2.getAddress()));
+        TransactionResource transaction = getContent(mvcResult,TransactionResource.class);
+        assertThat(transaction.getAmount(), is(transactionRequest.getAmount()));
+        assertThat(transaction.getSourceAddress(), is(address1.getAddress()));
+        assertThat(transaction.getTargetAddress(), is(address2.getAddress()));
+    }
+
+    private <T> T getContent(MvcResult mvcResult,Class<T> cls) throws IOException {
+        return mapper.readValue(mvcResult.getResponse().getContentAsString(), cls);
     }
 }

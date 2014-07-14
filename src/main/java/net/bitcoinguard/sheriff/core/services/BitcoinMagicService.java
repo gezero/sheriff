@@ -24,4 +24,6 @@ public interface BitcoinMagicService {
     Map<String, String> generateKeyPair();
 
     String getAddressFromRedeemScript(String multiSignatureRedeemScript);
+
+    String createTransaction(String address, String targetAddress, Long amount);
 }

@@ -43,6 +43,11 @@ public class P2shAddressesRepositoryImpl implements P2shAddressesRepositoryCusto
 
     @Override
     public Transaction createNewTransaction(P2shAddress address, String targetAddress, Long amount) {
-        return null;
+        Transaction transaction =new Transaction();
+        transaction.setAmount(amount);
+        transaction.setRawTransaction(bitcoinMagicService.createTransaction(address.getAddress(),targetAddress,amount));
+        transaction.setTargetAddress(targetAddress);
+        transaction.setSourceAddrees(address.getAddress());
+        return transaction;
     }
 }

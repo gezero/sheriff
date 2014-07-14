@@ -48,4 +48,9 @@ public class BitcoinJMagicService implements BitcoinMagicService {
         System.arraycopy(checkSum,0,address,bytes.length,4);
         return Base58.encode(address);
     }
+
+    @Override
+    public String createTransaction(String address, String targetAddress, Long amount) {
+        return null;
+    }
 }
