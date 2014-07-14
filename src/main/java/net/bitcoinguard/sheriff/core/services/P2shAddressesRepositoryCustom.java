@@ -10,5 +10,5 @@ import java.util.List;
  */
 public interface P2shAddressesRepositoryCustom {
     P2shAddress createNew(List<String> publicKeys, Integer requiredKeys);
-    Transaction createNewTransaction(Long addressId, String targetAddress, Long amount);
+    Transaction createNewTransaction(P2shAddress address, String targetAddress, Long amount);
 }

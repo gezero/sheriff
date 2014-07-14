@@ -69,11 +69,12 @@ public class P2shAddressController {
         return new ResponseEntity<>(p2shAddressResource, headers, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/{addressId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/{addressString}/transactions", method = RequestMethod.POST)
     public
     @ResponseBody
-    ResponseEntity<TransactionResource> createTransaction(@PathVariable Long addressId, @RequestBody TransactionResource transactionResource) {
-        Transaction transaction = p2shAddressesRepository.createNewTransaction(addressId, transactionResource.getTargetAddress(), transactionResource.getAmount());
+    ResponseEntity<TransactionResource> createTransaction(@PathVariable String addressString, @RequestBody TransactionResource transactionResource) {
+        P2shAddress address = p2shAddressesRepository.findByAddress(addressString);
+        Transaction transaction = p2shAddressesRepository.createNewTransaction(address, transactionResource.getTargetAddress(), transactionResource.getAmount());
         TransactionResource resource = new TransactionResourceAsm().toResource(transaction);
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create(resource.getLink("self").getHref()));

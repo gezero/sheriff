@@ -134,9 +134,12 @@ public class P2shAddressControllerTest {
         transaction.setId(1L);
         transaction.setRawTransaction("rawTransaction");
 
-        when(p2shAddressesRepository.createNewTransaction(transaction.getId(),transaction.getTargetAddress(),transaction.getAmount())).thenReturn(transaction);
+        P2shAddress address = new P2shAddress();
 
-        mockMvc.perform(post("/rest/addresses/1")
+        when(p2shAddressesRepository.findByAddress("sourceAddress")).thenReturn(address);
+        when(p2shAddressesRepository.createNewTransaction(address,transaction.getTargetAddress(),transaction.getAmount())).thenReturn(transaction);
+
+        mockMvc.perform(post("/rest/addresses/sourceAddress/transactions")
                         .content("{\"amount\":10000,\"targetAddress\":\"targetAddress\"}")
                         .contentType(MediaType.APPLICATION_JSON)
         )

@@ -42,7 +42,7 @@ public class P2shAddressesRepositoryImpl implements P2shAddressesRepositoryCusto
     }
 
     @Override
-    public Transaction createNewTransaction(Long addressId, String targetAddress, Long amount) {
+    public Transaction createNewTransaction(P2shAddress address, String targetAddress, Long amount) {
         return null;
     }
 }
