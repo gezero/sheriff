@@ -42,7 +42,9 @@ public class P2shAddressControllerTest {
     KeysRepositoryCustom keysRepository;
 
     @Captor
-    ArgumentCaptor<List<String>> captor;
+    ArgumentCaptor<List<String>> listStringCaptor;
+    @Captor
+    ArgumentCaptor<P2shAddress> addressCaptor;
 
     P2shAddress testAddress;
     Key testKey;
@@ -97,6 +99,7 @@ public class P2shAddressControllerTest {
 
         when(keysRepository.generateNewKey()).thenReturn(testKey);
         when(p2shAddressesRepository.createNew(anyList(), any(Integer.class))).thenReturn(testAddress);
+        when(p2shAddressesRepository.save(testAddress)).thenReturn(testAddress);
 
         mockMvc.perform(post("/rest/addresses")
                         .content("{\"keys\":[\"key1\",\"key2\"],\"requiredKeys\":2, \"totalKeys\":3}")
@@ -108,10 +111,12 @@ public class P2shAddressControllerTest {
                 .andExpect(jsonPath("$.keys[*]", hasItem("testKey")))
                 .andExpect(jsonPath("$.links[*].href", hasItem(endsWith("/addresses/testAddress"))));
 
-        verify(p2shAddressesRepository).createNew(captor.capture(), anyInt());
+        verify(p2shAddressesRepository).createNew(listStringCaptor.capture(), anyInt());
 
-        List<String> keys = captor.getValue();
+        List<String> keys = listStringCaptor.getValue();
         assertThat(keys, contains("key1", "key2", testKey.getPublicKey()));
+
+        verify(p2shAddressesRepository).save(addressCaptor.capture());
 
     }
 
