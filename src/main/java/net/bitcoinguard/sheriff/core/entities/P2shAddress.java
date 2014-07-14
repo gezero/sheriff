@@ -1,9 +1,6 @@
 package net.bitcoinguard.sheriff.core.entities;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import javax.persistence.*;
 import java.util.List;
 
 /**
@@ -17,6 +14,7 @@ public class P2shAddress {
     private List<Key> keys;
 
     @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     public Long getId() {
         return id;
     }
@@ -41,7 +39,7 @@ public class P2shAddress {
         this.redeemScript = redeemScript;
     }
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL) //TODO: I am pretty sure this is wrong... Am I not overriding all keys sometimes?
     @JoinTable(name="ADDRESS_KEYS")
     public List<Key> getKeys() {
         return keys;
