@@ -9,6 +9,7 @@ import net.bitcoinguard.sheriff.rest.entities.P2shAddressResource;
 import net.bitcoinguard.sheriff.rest.entities.TransactionResource;
 import net.bitcoinguard.sheriff.rest.entities.asm.P2shAddressResourceAsm;
 import net.bitcoinguard.sheriff.rest.entities.asm.TransactionResourceAsm;
+import net.bitcoinguard.sheriff.rest.exceptions.AddressNotFoundException;
 import net.bitcoinguard.sheriff.rest.exceptions.NoKeysProvidedException;
 import net.bitcoinguard.sheriff.rest.exceptions.NotFoundException;
 import net.bitcoinguard.sheriff.rest.exceptions.ToManyKeysException;
@@ -74,6 +75,9 @@ public class P2shAddressController {
     @ResponseBody
     ResponseEntity<TransactionResource> createTransaction(@PathVariable String addressString, @RequestBody TransactionResource transactionResource) {
         P2shAddress address = p2shAddressesRepository.findByAddress(addressString);
+        if (address == null){
+            throw new AddressNotFoundException();
+        }
         Transaction transaction = p2shAddressesRepository.createNewTransaction(address, transactionResource.getTargetAddress(), transactionResource.getAmount());
         TransactionResource resource = new TransactionResourceAsm().toResource(transaction);
         HttpHeaders headers = new HttpHeaders();

@@ -149,6 +149,17 @@ public class P2shAddressControllerTest {
     }
 
     @Test
+    public void testCanCreateTransactionOnlyOnExistingAddress() throws Exception{
+
+        mockMvc.perform(post("/rest/addresses/sourceAddress/transactions")
+                        .content("{\"amount\":10000,\"targetAddress\":\"targetAddress\"}")
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     public void testNothingInRequest() throws Exception {
         mockMvc
                 .perform(post("/rest/addresses")
