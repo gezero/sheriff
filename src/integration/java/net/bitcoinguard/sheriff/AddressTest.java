@@ -1,4 +1,4 @@
-package net.bitcoinguard.endtoend;
+package net.bitcoinguard.sheriff;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;

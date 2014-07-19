@@ -26,7 +26,19 @@ repositories {
     mavenCentral()
     mavenLocal()
 }
+sourceSets {
+    integrationTests {
+        java.srcDir file('src/integration/java')
+        resources.srcDir file('src/integration/resources')
+    }
+}
 
+task integrationTests(type: Test) {
+    testClassesDir = sourceSets.integrationTests.output.classesDir
+    classpath = sourceSets.integrationTests.runtimeClasspath
+}
+
+check.dependsOn integrationTests
 
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")
@@ -38,6 +50,10 @@ dependencies {
     testCompile("org.springframework.boot:spring-boot-starter-test")
     testCompile('com.jayway.jsonpath:json-path:0.9.1')
     testCompile('com.jayway.jsonpath:json-path-assert:0.9.1')
+    integrationTestsCompile sourceSets.main.output
+    integrationTestsCompile configurations.testCompile
+    integrationTestsCompile sourceSets.test.output
+    integrationTestsRuntime configurations.testRuntime
 }
 
 eclipse {
