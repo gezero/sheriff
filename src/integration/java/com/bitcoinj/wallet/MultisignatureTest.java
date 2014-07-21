@@ -5,6 +5,7 @@ import com.google.bitcoin.crypto.TransactionSignature;
 import com.google.bitcoin.script.Script;
 import com.google.bitcoin.script.ScriptBuilder;
 import com.google.common.util.concurrent.ListenableFuture;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,6 +103,7 @@ public class MultisignatureTest  extends WalletTests{
 
 
     @Test
+    @Ignore("test is using coins")
     public void fullScenario() throws Exception {
 
         //We will create two keys that will be used in this test
@@ -127,7 +129,7 @@ public class MultisignatureTest  extends WalletTests{
         //We will now try to send money to the multisign address
         Transaction depositTransaction;
         try {
-            depositTransaction = sendMoneyToAddress(Transaction.REFERENCE_DEFAULT_MIN_TX_FEE.multiply(3), p2shAddress);
+            depositTransaction = sendMoneyToAddress(MINIMUM_TO_SEND, p2shAddress);
         } catch (com.google.bitcoin.core.InsufficientMoneyException e) {
             logger.error("Your balance is: {}", getBalance());
             logger.error("Send faucet money to this address {}", freshAddress());

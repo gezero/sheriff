@@ -5,6 +5,7 @@ import com.google.bitcoin.kits.WalletAppKit;
 import com.google.bitcoin.params.TestNet3Params;
 import com.google.common.util.concurrent.ListenableFuture;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,8 @@ import java.util.concurrent.CyclicBarrier;
  */
 public class WalletTests {
     private static final Logger logger = LoggerFactory.getLogger(WalletTests.class);
+    protected final Coin MINIMUM_TO_SEND = Transaction.REFERENCE_DEFAULT_MIN_TX_FEE.multiply(3);
+
 
 
     private final File workingDirectory = new File("build/work");
@@ -132,6 +135,7 @@ public class WalletTests {
     }
 
     @Test
+    @Ignore("test is using wallet")
     public void showBalance() {
         logger.info(getBalance().toFriendlyString());
     }
