@@ -12,6 +12,7 @@ public class P2shAddress {
     private String address;
     private String redeemScript;
     private List<Key> keys;
+    private Long balance;
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -47,5 +48,13 @@ public class P2shAddress {
 
     public void setKeys(List<Key> keys) {
         this.keys = keys;
+    }
+
+    public Long getBalance() {
+        return balance;
+    }
+
+    public void setBalance(Long balance) {
+        this.balance = balance;
     }
 }

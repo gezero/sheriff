@@ -28,4 +28,6 @@ public interface BitcoinMagicService {
     String createTransaction(String address, String targetAddress, Long amount);
 
     void watchAddress(String address);
+
+    Long getBalance(String address);
 }

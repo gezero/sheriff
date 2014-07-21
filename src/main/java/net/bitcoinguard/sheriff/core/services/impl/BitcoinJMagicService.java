@@ -6,7 +6,10 @@ import com.google.bitcoin.script.ScriptBuilder;
 import net.bitcoinguard.sheriff.core.services.BitcoinMagicService;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Jiri on 11. 7. 2014.
@@ -46,13 +49,13 @@ public class BitcoinJMagicService implements BitcoinMagicService {
     public String getAddressFromRedeemScript(String multiSignatureRedeemScript) {
         Script script = new Script(Utils.HEX.decode(multiSignatureRedeemScript));
         byte[] sha256hash160 = Utils.sha256hash160(script.getProgram());
-        byte[] bytes = new byte[sha256hash160.length+1];
-        bytes[0]= -60;
-        System.arraycopy(sha256hash160,0,bytes,1,sha256hash160.length);
+        byte[] bytes = new byte[sha256hash160.length + 1];
+        bytes[0] = -60;
+        System.arraycopy(sha256hash160, 0, bytes, 1, sha256hash160.length);
         byte[] checkSum = Utils.doubleDigest(bytes);
         byte[] address = new byte[bytes.length + 4];
-        System.arraycopy(bytes,0,address,0,bytes.length);
-        System.arraycopy(checkSum,0,address,bytes.length,4);
+        System.arraycopy(bytes, 0, address, 0, bytes.length);
+        System.arraycopy(checkSum, 0, address, bytes.length, 4);
         return Base58.encode(address);
     }
 
@@ -64,12 +67,17 @@ public class BitcoinJMagicService implements BitcoinMagicService {
     @Override
     public void watchAddress(String addressString) {
         try {
-            Address address = new Address(networkParams,addressString);
+            Address address = new Address(networkParams, addressString);
             wallet.addWatchedAddress(address);
         } catch (AddressFormatException e) {
             //todo: maybe create some exception for this?
             throw new RuntimeException(e);
         }
 
+    }
+
+    @Override
+    public Long getBalance(String address) {
+        return null;
     }
 }

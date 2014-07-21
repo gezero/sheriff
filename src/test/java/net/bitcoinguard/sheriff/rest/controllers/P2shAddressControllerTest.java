@@ -5,6 +5,7 @@ import net.bitcoinguard.sheriff.core.entities.P2shAddress;
 import net.bitcoinguard.sheriff.core.entities.Transaction;
 import net.bitcoinguard.sheriff.core.services.KeysRepositoryCustom;
 import net.bitcoinguard.sheriff.core.services.P2shAddressesRepository;
+import net.bitcoinguard.sheriff.core.services.impl.BitcoinJMagicService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.*;
@@ -40,6 +41,8 @@ public class P2shAddressControllerTest {
     P2shAddressesRepository p2shAddressesRepository;
     @Mock
     KeysRepositoryCustom keysRepository;
+    @Mock
+    BitcoinJMagicService bitcoinJMagicService;
 
     @Captor
     ArgumentCaptor<List<String>> listStringCaptor;
@@ -61,6 +64,7 @@ public class P2shAddressControllerTest {
         testAddress.setId(1L);
         testAddress.setAddress("testAddress");
         testAddress.setRedeemScript("redeemScript");
+        testAddress.setBalance(10L);
         List<Key> returnKeys = new ArrayList<>();
         testAddress.setKeys(returnKeys);
         testKey = new Key();
@@ -75,12 +79,13 @@ public class P2shAddressControllerTest {
     public void testFindExistingAddress() throws Exception {
 
         when(p2shAddressesRepository.findByAddress("testAddress")).thenReturn(testAddress);
+        when(bitcoinJMagicService.getBalance("testAddress")).thenReturn(10L);
 
         mockMvc.perform(get("/rest/addresses/testAddress"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.address", is(testAddress.getAddress())))
                 .andExpect(jsonPath("$.links[*].href", hasItem(endsWith("/addresses/testAddress"))))
-                .andExpect(jsonPath("$.balance", is(0)));
+                .andExpect(jsonPath("$.balance", is(10)));
 
     }
 
@@ -118,7 +123,6 @@ public class P2shAddressControllerTest {
         assertThat(keys, contains("key1", "key2", testKey.getPublicKey()));
 
         verify(p2shAddressesRepository).save(addressCaptor.capture());
-
     }
 
     @Test
