@@ -79,7 +79,8 @@ public class P2shAddressControllerTest {
         mockMvc.perform(get("/rest/addresses/testAddress"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.address", is(testAddress.getAddress())))
-                .andExpect(jsonPath("$.links[*].href", hasItem(endsWith("/addresses/testAddress"))));
+                .andExpect(jsonPath("$.links[*].href", hasItem(endsWith("/addresses/testAddress"))))
+                .andExpect(jsonPath("$.balance", is(0)));
 
     }
 

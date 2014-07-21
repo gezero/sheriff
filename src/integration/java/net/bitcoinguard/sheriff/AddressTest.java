@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.hateoas.Link;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -30,6 +31,7 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -92,6 +94,22 @@ public class AddressTest {
         keys.add(Utils.HEX.encode(key2.getPubKey()));
         request.setKeys(keys);
         return request;
+    }
+
+    @Test
+    public void checkBalance() throws Exception{
+        P2shAddressResource request = addressRequest();
+
+        MvcResult mvcResult = mockMvc.perform(post("/rest/addresses")
+                        .content(prepareRequest(request))
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andReturn();
+        P2shAddressResource address = getContent(mvcResult,P2shAddressResource.class);
+
+
+        mockMvc.perform(get("/rest/addresses/"+address.getAddress()))
+                .andDo(print())
+                .andExpect(jsonPath("$.balance",is(0)));
     }
 
     @Test

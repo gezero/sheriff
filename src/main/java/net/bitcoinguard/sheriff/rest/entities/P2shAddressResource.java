@@ -12,6 +12,7 @@ public class P2shAddressResource extends ResourceSupport {
     String redeemScript;
     Integer totalKeys = 3;
     Integer requiredKeys = 2;
+    Long balance = 0L;
     List<String> keys;
 
     public String getAddress() {
@@ -48,6 +49,14 @@ public class P2shAddressResource extends ResourceSupport {
 
     public List<String> getKeys() {
         return keys;
+    }
+
+    public Long getBalance() {
+        return balance;
+    }
+
+    public void setBalance(Long balance) {
+        this.balance = balance;
     }
 
     public void setKeys(List<String> keys) {
