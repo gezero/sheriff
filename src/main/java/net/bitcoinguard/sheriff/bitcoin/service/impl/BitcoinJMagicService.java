@@ -3,14 +3,12 @@ package net.bitcoinguard.sheriff.bitcoin.service.impl;
 import com.google.bitcoin.core.*;
 import com.google.bitcoin.script.Script;
 import com.google.bitcoin.script.ScriptBuilder;
+import net.bitcoinguard.sheriff.bitcoin.exceptions.NotEnoughMoneyException;
 import net.bitcoinguard.sheriff.bitcoin.service.BitcoinMagicService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Jiri on 11. 7. 2014.
@@ -63,7 +61,43 @@ public class BitcoinJMagicService implements BitcoinMagicService {
 
     @Override
     public String createTransaction(String address, String targetAddress, Long amount) {
-        return null;
+        Transaction transaction = new Transaction(networkParams);
+        try {
+            Address sourceAddress = new Address(networkParams,address);
+            Coin coinAmount = Coin.valueOf(amount);
+            Coin total = addInputs(transaction, sourceAddress, coinAmount.add(Transaction.REFERENCE_DEFAULT_MIN_TX_FEE));
+            if (total.isLessThan(coinAmount)){
+                throw new NotEnoughMoneyException();
+            }
+
+            Address toAddress = new Address(networkParams,targetAddress);
+            TransactionOutput output = new TransactionOutput(networkParams,transaction,coinAmount,toAddress);
+            transaction.addOutput(output);
+            if (total.isGreaterThan(coinAmount.add(Transaction.REFERENCE_DEFAULT_MIN_TX_FEE))){
+                TransactionOutput returnRest = new TransactionOutput(networkParams,transaction,total.subtract(Transaction.REFERENCE_DEFAULT_MIN_TX_FEE).subtract(coinAmount),sourceAddress);
+                transaction.addOutput(returnRest);
+
+            }
+
+        } catch (AddressFormatException e) {
+            throw new RuntimeException(e);
+        }
+        return Utils.HEX.encode(transaction.bitcoinSerialize());
+    }
+
+    private Coin addInputs(Transaction transaction, Address sourceAddress, Coin amount) {
+        LinkedList<TransactionOutput> watchedOutputs = wallet.getWatchedOutputs(true);
+        Coin total = Coin.ZERO;
+        for (TransactionOutput watchedOutput : watchedOutputs) {
+            if (watchedOutput.getScriptPubKey().getToAddress(networkParams).equals(sourceAddress)) {
+                transaction.addInput(watchedOutput);
+                total = total.add(watchedOutput.getValue());
+                if (total.isGreaterThan(amount)){
+                    return total;
+                }
+            }
+        }
+        return total;
     }
 
     @Override

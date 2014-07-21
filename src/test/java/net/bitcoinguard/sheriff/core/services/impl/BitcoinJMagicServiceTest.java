@@ -10,14 +10,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class BitcoinJMagicServiceTest {
 
@@ -113,5 +111,54 @@ public class BitcoinJMagicServiceTest {
         bitcoinJMagicService.watchAddress("2Msw9G6MXP65fzQF2yUfDufFmSHtNUX33Nq");
         verify(wallet).addWatchedAddress(captor.capture());
         assertThat(captor.getValue().toString(),is("2Msw9G6MXP65fzQF2yUfDufFmSHtNUX33Nq"));
+    }
+
+    @Test
+    public void testCreatingTransaction() throws Exception {
+
+        Address testAddress = new Address(networkParameters,"2Msw9G6MXP65fzQF2yUfDufFmSHtNUX33Nq");
+        Address targetAddress = new Address(networkParameters,"mp9wNxGrXxqtvWJjtcUNadskXhxku7u9mi");
+
+
+        LinkedList<TransactionOutput> allOutputs = new LinkedList<>(watchedOutput(testAddress));
+        when(wallet.getWatchedOutputs(true)).thenReturn(allOutputs);
+
+
+        String rawTransaction = bitcoinJMagicService.createTransaction(testAddress.toString(), targetAddress.toString(), Coin.MILLICOIN.longValue());
+
+        Transaction transaction = new Transaction(networkParameters,Utils.HEX.decode(rawTransaction));
+        Coin outputTotal = Coin.ZERO;
+        Coin targetTotal = Coin.ZERO;
+        Coin returnTotal = Coin.ZERO;
+        for (TransactionOutput output : transaction.getOutputs()) {
+            outputTotal = outputTotal.add(output.getValue());
+            if (output.getScriptPubKey().getToAddress(networkParameters).equals(targetAddress)){
+                targetTotal = targetTotal.add(output.getValue());
+            }
+            if (output.getScriptPubKey().getToAddress(networkParameters).equals(testAddress)){
+                returnTotal = returnTotal.add(output.getValue());
+            }
+        }
+        Coin inputTotal = Coin.ZERO;
+        for (TransactionInput transactionInput : transaction.getInputs()) {
+            Sha256Hash hash = transactionInput.getOutpoint().getHash();
+            assertThat(hash, is(new Sha256Hash("a237c0cb964b40f1dc12cd7249f7035627185f18650a419673d796987dc9ae1c")));
+            TransactionOutput output = allOutputs.get((int) transactionInput.getOutpoint().getIndex());
+            inputTotal = inputTotal.add(output.getValue());
+        }
+
+        assertThat(outputTotal.longValue(),is(greaterThan(Coin.MILLICOIN.longValue())));
+        assertThat(targetTotal,is(Coin.MILLICOIN));
+        assertThat(targetTotal.add(returnTotal),is(outputTotal));
+        assertThat(inputTotal.subtract(Transaction.REFERENCE_DEFAULT_MIN_TX_FEE),is(outputTotal));
+    }
+
+    private List<TransactionOutput> watchedOutput(Address address) {
+        Transaction transaction = new Transaction(networkParameters);
+        transaction.addOutput(new TransactionOutput(networkParameters,transaction,Coin.MILLICOIN.divide(2),address));
+        transaction.addOutput(new TransactionOutput(networkParameters,transaction,Coin.MILLICOIN.divide(2),address));
+        transaction.addOutput(new TransactionOutput(networkParameters,transaction,Coin.MILLICOIN.divide(2),address));
+        transaction.addOutput(new TransactionOutput(networkParameters,transaction,Coin.MILLICOIN.divide(2),address));
+        return transaction.getOutputs();
     }
 }
