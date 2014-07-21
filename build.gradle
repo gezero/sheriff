@@ -36,7 +36,6 @@ sourceSets {
 task integrationTests(type: Test) {
     testClassesDir = sourceSets.integrationTests.output.classesDir
     classpath = sourceSets.integrationTests.runtimeClasspath
-    exclude 'com/bitcoinj/wallet/**'
 }
 
 check.dependsOn integrationTests
