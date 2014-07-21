@@ -98,7 +98,7 @@ public class AddressWalletTest extends WalletTests {
     }
 
     @Test
-//    @Ignore("test is using coins")
+    @Ignore("test is using coins")
     public void testBasicTransaction() throws Exception {
         P2shAddressResource request = addressRequest();
 
