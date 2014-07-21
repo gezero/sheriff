@@ -94,7 +94,7 @@ public class AddressWalletTest extends WalletTests {
     }
 
     @Test
-    @Ignore("test is using coins")
+//    @Ignore("test is using coins")
     public void checkBalance() throws Exception {
         P2shAddressResource request = addressRequest();
 
@@ -111,9 +111,11 @@ public class AddressWalletTest extends WalletTests {
 
         sendMoneyToAddress(MINIMUM_TO_SEND,address.getAddress());
 
+        Thread.sleep(10000);
+
         mockMvc.perform(get("/rest/addresses/" + address.getAddress()))
                 .andDo(print())
-                .andExpect(jsonPath("$.balance", is(MINIMUM_TO_SEND.longValue())));
+                .andExpect(jsonPath("$.balance", is((int)MINIMUM_TO_SEND.longValue())));
     }
 
 }

@@ -48,7 +48,7 @@ public class BitcoinJEventListener implements WalletEventListener {
                 if (coin == null) {
                     coin = Coin.ZERO;
                 }
-                coin.add(watchedOutput.getValue());
+                balances.put(toAddress,coin.add(watchedOutput.getValue()));
             }
         }
         for (Address address : balances.keySet()) {
