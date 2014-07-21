@@ -1,11 +1,13 @@
 package net.bitcoinguard.sheriff.core.services.impl;
 
-import com.google.bitcoin.core.ECKey;
-import com.google.bitcoin.core.Utils;
+import com.google.bitcoin.core.*;
+import com.google.bitcoin.params.TestNet3Params;
 import com.google.bitcoin.script.Script;
 import com.google.bitcoin.script.ScriptChunk;
 import com.google.bitcoin.script.ScriptOpCodes;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,9 +16,25 @@ import java.util.Map;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.verify;
 
 public class BitcoinJMagicServiceTest {
-    BitcoinJMagicService bitcoinJMagicService = new BitcoinJMagicService();
+
+    @InjectMocks
+    BitcoinJMagicService bitcoinJMagicService;
+
+    @Mock
+    Wallet wallet;
+    @Spy
+    NetworkParameters networkParameters = TestNet3Params.get();
+    @Captor
+    ArgumentCaptor<Address> captor;
+
+
+    @Before
+    public void setUp(){
+        MockitoAnnotations.initMocks(this);
+    }
 
     @Test
     public void testGenerateKeyPair() throws Exception {
@@ -82,11 +100,17 @@ public class BitcoinJMagicServiceTest {
         byte[] scriptHash = Utils.sha256hash160(script.getProgram()); //we create the hash of the script
         String address = bitcoinJMagicService.getAddressFromRedeemScript(multiSignatureRedeemScript);
         byte[] addressDecoded = Utils.parseAsHexOrBase58(address);  //we decode the address provided
-        byte firstByteOfAddress = -60; //This is the number 3 in normal addresses but is 2 in testnet that prefix the address
+        byte firstByteOfAddress = -60; //This is the number 3 in normal addresses but is 2 in testnet that prefix the address see NetworkParams.p2shHeader
         byte[] addressWithoutFirstByte = Arrays.copyOfRange(addressDecoded, 1, addressDecoded.length);  //we take out the first character so that we can compare the hash
 
         assertThat(addressDecoded[0], is(firstByteOfAddress));  //first character has to be special character for the network
         assertThat(scriptHash, is(equalTo(addressWithoutFirstByte)));  //the rest should match
+    }
 
+    @Test
+    public void testWatchingAddress(){
+        bitcoinJMagicService.watchAddress("2Msw9G6MXP65fzQF2yUfDufFmSHtNUX33Nq");
+        verify(wallet).addWatchedAddress(captor.capture());
+        assertThat(captor.getValue().toString(),is("2Msw9G6MXP65fzQF2yUfDufFmSHtNUX33Nq"));
     }
 }

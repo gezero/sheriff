@@ -1,8 +1,6 @@
 package net.bitcoinguard.sheriff.core.services.impl;
 
-import com.google.bitcoin.core.Base58;
-import com.google.bitcoin.core.ECKey;
-import com.google.bitcoin.core.Utils;
+import com.google.bitcoin.core.*;
 import com.google.bitcoin.script.Script;
 import com.google.bitcoin.script.ScriptBuilder;
 import net.bitcoinguard.sheriff.core.services.BitcoinMagicService;
@@ -15,6 +13,15 @@ import java.util.*;
  */
 @Service
 public class BitcoinJMagicService implements BitcoinMagicService {
+
+    Wallet wallet;
+    private NetworkParameters networkParams;
+
+    public BitcoinJMagicService(Wallet wallet, NetworkParameters networkParams) {
+        this.wallet = wallet;
+        this.networkParams = networkParams;
+    }
+
     @Override
     public String createMultiSignatureRedeemScript(List<String> publicKeys, int requiredKeys) {
 
@@ -55,7 +62,14 @@ public class BitcoinJMagicService implements BitcoinMagicService {
     }
 
     @Override
-    public void watchAddress(String address) {
+    public void watchAddress(String addressString) {
+        try {
+            Address address = new Address(networkParams,addressString);
+            wallet.addWatchedAddress(address);
+        } catch (AddressFormatException e) {
+            //todo: maybe create some exception for this?
+            throw new RuntimeException(e);
+        }
 
     }
 }
