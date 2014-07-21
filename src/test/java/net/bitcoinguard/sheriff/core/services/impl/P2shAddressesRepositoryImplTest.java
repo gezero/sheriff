@@ -17,6 +17,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class P2shAddressesRepositoryImplTest {
@@ -49,6 +50,7 @@ public class P2shAddressesRepositoryImplTest {
         for (Key addressKey : addressKeys) {
             assertThat(keys, hasItem(addressKey.getPublicKey()));
         }
+        verify(bitcoinMagicService).watchAddress("address");
     }
 
     @Test

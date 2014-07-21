@@ -38,6 +38,7 @@ public class P2shAddressesRepositoryImpl implements P2shAddressesRepositoryCusto
             keys.add(key);
         }
         address.setKeys(keys);
+        bitcoinMagicService.watchAddress(address.getAddress());
         return address;
     }
 

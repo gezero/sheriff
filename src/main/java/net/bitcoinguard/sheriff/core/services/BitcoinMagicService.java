@@ -26,4 +26,6 @@ public interface BitcoinMagicService {
     String getAddressFromRedeemScript(String multiSignatureRedeemScript);
 
     String createTransaction(String address, String targetAddress, Long amount);
+
+    void watchAddress(String address);
 }

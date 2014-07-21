@@ -53,4 +53,9 @@ public class BitcoinJMagicService implements BitcoinMagicService {
     public String createTransaction(String address, String targetAddress, Long amount) {
         return null;
     }
+
+    @Override
+    public void watchAddress(String address) {
+
+    }
 }
