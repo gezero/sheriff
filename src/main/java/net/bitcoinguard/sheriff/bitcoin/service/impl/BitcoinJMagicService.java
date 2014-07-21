@@ -4,6 +4,7 @@ import com.google.bitcoin.core.*;
 import com.google.bitcoin.script.Script;
 import com.google.bitcoin.script.ScriptBuilder;
 import net.bitcoinguard.sheriff.bitcoin.service.BitcoinMagicService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ public class BitcoinJMagicService implements BitcoinMagicService {
     Wallet wallet;
     private NetworkParameters networkParams;
 
+    @Autowired
     public BitcoinJMagicService(Wallet wallet, NetworkParameters networkParams) {
         this.wallet = wallet;
         this.networkParams = networkParams;
