@@ -6,6 +6,7 @@ import net.bitcoinguard.sheriff.core.entities.Transaction;
 import net.bitcoinguard.sheriff.core.services.KeysRepositoryCustom;
 import net.bitcoinguard.sheriff.core.services.P2shAddressesRepository;
 import net.bitcoinguard.sheriff.bitcoin.service.impl.BitcoinJMagicService;
+import net.bitcoinguard.sheriff.core.services.TransactionsRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.*;
@@ -39,6 +40,8 @@ public class P2shAddressControllerTest {
 
     @Mock
     P2shAddressesRepository p2shAddressesRepository;
+    @Mock
+    TransactionsRepository transactionsRepository;
     @Mock
     KeysRepositoryCustom keysRepository;
     @Mock
@@ -139,16 +142,16 @@ public class P2shAddressControllerTest {
 
     @Test
     public void testCreateTransaction() throws Exception{
-        Transaction transaction = new Transaction();
-        transaction.setTargetAddress("targetAddress");
-        transaction.setAmount(10000L);
-        transaction.setId(1L);
-        transaction.setRawTransaction("rawTransaction");
+        Transaction transaction = createTransaction();
+        Transaction transactionWithId = createTransaction();
+        transactionWithId.setId(1L);
+
 
         P2shAddress address = new P2shAddress();
 
         when(p2shAddressesRepository.findByAddress("sourceAddress")).thenReturn(address);
-        when(p2shAddressesRepository.createNewTransaction(address,transaction.getTargetAddress(),transaction.getAmount())).thenReturn(transaction);
+        when(p2shAddressesRepository.createNewTransaction(address, transaction.getTargetAddress(), transaction.getAmount())).thenReturn(transaction);
+        when(transactionsRepository.save(transaction)).thenReturn(transactionWithId);
 
         mockMvc.perform(post("/rest/addresses/sourceAddress/transactions")
                         .content("{\"amount\":10000,\"targetAddress\":\"targetAddress\"}")
@@ -157,6 +160,15 @@ public class P2shAddressControllerTest {
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.links[*].href", hasItem(endsWith("/transactions/1"))));
+        verify(transactionsRepository).save(transaction);
+    }
+
+    private Transaction createTransaction() {
+        Transaction transaction = new Transaction();
+        transaction.setTargetAddress("targetAddress");
+        transaction.setAmount(10000L);
+        transaction.setRawTransaction("rawTransaction");
+        return transaction;
     }
 
     @Test

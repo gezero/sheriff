@@ -4,8 +4,10 @@ import com.bitcoinj.wallet.WalletTests;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.bitcoin.core.ECKey;
 import com.google.bitcoin.core.Utils;
+import net.bitcoinguard.sheriff.core.entities.Transaction;
 import net.bitcoinguard.sheriff.rest.controllers.P2shAddressController;
 import net.bitcoinguard.sheriff.rest.entities.P2shAddressResource;
+import net.bitcoinguard.sheriff.rest.entities.TransactionResource;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -25,7 +27,9 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -95,7 +99,7 @@ public class AddressWalletTest extends WalletTests {
 
     @Test
 //    @Ignore("test is using coins")
-    public void checkBalance() throws Exception {
+    public void testBasicTransaction() throws Exception {
         P2shAddressResource request = addressRequest();
 
         MvcResult mvcResult = mockMvc.perform(post("/rest/addresses")
@@ -116,6 +120,22 @@ public class AddressWalletTest extends WalletTests {
         mockMvc.perform(get("/rest/addresses/" + address.getAddress()))
                 .andDo(print())
                 .andExpect(jsonPath("$.balance", is((int)MINIMUM_TO_SEND.longValue())));
+
+        TransactionResource transactionRequest = new TransactionResource();
+        String targetAddress = freshAddress().toString();
+        transactionRequest.setTargetAddress(targetAddress);
+        transactionRequest.setAmount(MINIMUM_TO_SEND.subtract(com.google.bitcoin.core.Transaction.REFERENCE_DEFAULT_MIN_TX_FEE).longValue());
+        mvcResult = mockMvc.perform(post("/rest/addresses/" + address.getAddress() + "/transactions")
+                        .content(prepareRequest(transactionRequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andReturn();
+
+        TransactionResource transaction = getContent(mvcResult, TransactionResource.class);
+        assertThat(transaction.getAmount(), is(transactionRequest.getAmount()));
+        assertThat(transaction.getSourceAddress(), is(address.getAddress()));
+        assertThat(transaction.getTargetAddress(), is(targetAddress));
+
     }
+
 
 }

@@ -95,40 +95,6 @@ public class AddressTest {
     }
 
 
-    @Test
-    public void createNewTransaction() throws Exception {
-        P2shAddressResource request = addressRequest();
-
-        MvcResult mvcResult = mockMvc.perform(post("/rest/addresses")
-                        .content(prepareRequest(request))
-                        .contentType(MediaType.APPLICATION_JSON)
-        ).andReturn();
-
-        P2shAddressResource address1 = getContent(mvcResult, P2shAddressResource.class);
-
-        request = addressRequest();
-        mvcResult = mockMvc.perform(post("/rest/addresses")
-                        .content(prepareRequest(request))
-                        .contentType(MediaType.APPLICATION_JSON)
-        ).andReturn();
-        P2shAddressResource address2 = getContent(mvcResult, P2shAddressResource.class);
-
-        assertThat(address1.getAddress(), is(not(address2.getAddress())));
-
-        TransactionResource transactionRequest = new TransactionResource();
-        transactionRequest.setTargetAddress(address2.getAddress());
-        transactionRequest.setAmount(1000L);
-        mvcResult = mockMvc.perform(post("/rest/addresses/" + address1.getAddress() + "/transactions")
-                        .content(prepareRequest(transactionRequest))
-                        .contentType(MediaType.APPLICATION_JSON)
-        ).andReturn();
-
-        TransactionResource transaction = getContent(mvcResult, TransactionResource.class);
-        assertThat(transaction.getAmount(), is(transactionRequest.getAmount()));
-        assertThat(transaction.getSourceAddress(), is(address1.getAddress()));
-        assertThat(transaction.getTargetAddress(), is(address2.getAddress()));
-    }
-
     private <T> T getContent(MvcResult mvcResult, Class<T> cls) throws IOException {
         return mapper.readValue(mvcResult.getResponse().getContentAsString(), cls);
     }

@@ -5,6 +5,7 @@ import net.bitcoinguard.sheriff.core.entities.P2shAddress;
 import net.bitcoinguard.sheriff.core.entities.Transaction;
 import net.bitcoinguard.sheriff.core.services.KeysRepositoryCustom;
 import net.bitcoinguard.sheriff.core.services.P2shAddressesRepository;
+import net.bitcoinguard.sheriff.core.services.TransactionsRepository;
 import net.bitcoinguard.sheriff.rest.entities.P2shAddressResource;
 import net.bitcoinguard.sheriff.rest.entities.TransactionResource;
 import net.bitcoinguard.sheriff.rest.entities.asm.P2shAddressResourceAsm;
@@ -30,11 +31,13 @@ import java.net.URI;
 public class P2shAddressController {
     P2shAddressesRepository p2shAddressesRepository;
     KeysRepositoryCustom keysRepository;
+    TransactionsRepository transactionsRepository;
 
     @Autowired
-    public P2shAddressController(P2shAddressesRepository p2shAddressesRepository, KeysRepositoryCustom keysRepository) {
+    public P2shAddressController(P2shAddressesRepository p2shAddressesRepository, KeysRepositoryCustom keysRepository, TransactionsRepository transactionsRepository) {
         this.p2shAddressesRepository = p2shAddressesRepository;
         this.keysRepository = keysRepository;
+        this.transactionsRepository = transactionsRepository;
 
     }
 
@@ -80,6 +83,7 @@ public class P2shAddressController {
             throw new AddressNotFoundException();
         }
         Transaction transaction = p2shAddressesRepository.createNewTransaction(address, transactionResource.getTargetAddress(), transactionResource.getAmount());
+        transaction = transactionsRepository.save(transaction);
         TransactionResource resource = new TransactionResourceAsm().toResource(transaction);
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create(resource.getLink("self").getHref()));
