@@ -10,9 +10,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -39,6 +37,7 @@ public class TransactionControllerTest {
         Transaction transaction = new Transaction();
         transaction.setId(1L);
         transaction.setAmount(100000L);
+        transaction.setRawTransaction("rawTransaction");
 
 
         when(transactionsRepository.findOne(1L)).thenReturn(transaction);
@@ -47,6 +46,7 @@ public class TransactionControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.amount", is(100000)))
+                .andExpect(jsonPath("$.rawTransaction",is("rawTransaction")))
                 .andExpect(jsonPath("$.links[*].href", hasItem(endsWith("/transactions/1"))));
     }
 
