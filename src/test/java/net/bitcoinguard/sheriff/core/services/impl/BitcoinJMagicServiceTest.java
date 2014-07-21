@@ -120,7 +120,7 @@ public class BitcoinJMagicServiceTest {
         Address targetAddress = new Address(networkParameters,"mp9wNxGrXxqtvWJjtcUNadskXhxku7u9mi");
 
 
-        LinkedList<TransactionOutput> allOutputs = new LinkedList<>(watchedOutput(testAddress));
+        LinkedList<TransactionOutput> allOutputs = new LinkedList<>(watchedOutput(testAddress,targetAddress));
         when(wallet.getWatchedOutputs(true)).thenReturn(allOutputs);
 
 
@@ -143,7 +143,7 @@ public class BitcoinJMagicServiceTest {
         for (TransactionInput transactionInput : transaction.getInputs()) {
             Sha256Hash hash = transactionInput.getOutpoint().getHash();
             assertThat(hash, is(new Sha256Hash("a237c0cb964b40f1dc12cd7249f7035627185f18650a419673d796987dc9ae1c")));
-            TransactionOutput output = allOutputs.get((int) transactionInput.getOutpoint().getIndex());
+            TransactionOutput output = allOutputs.get((int) transactionInput.getOutpoint().getIndex()+1 );
             inputTotal = inputTotal.add(output.getValue());
         }
 
@@ -153,12 +153,17 @@ public class BitcoinJMagicServiceTest {
         assertThat(inputTotal.subtract(Transaction.REFERENCE_DEFAULT_MIN_TX_FEE),is(outputTotal));
     }
 
-    private List<TransactionOutput> watchedOutput(Address address) {
+    private List<TransactionOutput> watchedOutput(Address address, Address address2) {
         Transaction transaction = new Transaction(networkParameters);
         transaction.addOutput(new TransactionOutput(networkParameters,transaction,Coin.MILLICOIN.divide(2),address));
         transaction.addOutput(new TransactionOutput(networkParameters,transaction,Coin.MILLICOIN.divide(2),address));
         transaction.addOutput(new TransactionOutput(networkParameters,transaction,Coin.MILLICOIN.divide(2),address));
         transaction.addOutput(new TransactionOutput(networkParameters,transaction,Coin.MILLICOIN.divide(2),address));
-        return transaction.getOutputs();
+        Transaction transaction2 = new Transaction(networkParameters);
+        transaction2.addOutput(new TransactionOutput(networkParameters,transaction2,Coin.COIN.divide(2),address2));
+
+        List<TransactionOutput> list = new LinkedList<>(transaction2.getOutputs());
+        list.addAll(transaction.getOutputs());
+        return list;
     }
 }

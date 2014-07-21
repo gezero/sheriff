@@ -95,7 +95,4 @@ public class AddressTest {
     }
 
 
-    private <T> T getContent(MvcResult mvcResult, Class<T> cls) throws IOException {
-        return mapper.readValue(mvcResult.getResponse().getContentAsString(), cls);
-    }
 }

@@ -22,9 +22,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -107,7 +105,7 @@ public class P2shAddressControllerTest {
     public void testCreateNewAddress() throws Exception {
 
         when(keysRepository.generateNewKey()).thenReturn(testKey);
-        when(p2shAddressesRepository.createNew(anyList(), any(Integer.class))).thenReturn(testAddress);
+        when(p2shAddressesRepository.createNew(anyListOf(String.class), any(Integer.class))).thenReturn(testAddress);
         when(p2shAddressesRepository.save(testAddress)).thenReturn(testAddress);
 
         mockMvc.perform(post("/rest/addresses")
