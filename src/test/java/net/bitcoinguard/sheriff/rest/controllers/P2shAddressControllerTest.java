@@ -115,6 +115,7 @@ public class P2shAddressControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.address", is("testAddress")))
                 .andExpect(jsonPath("$.keys[*]", hasItem("testKey")))
+                .andExpect(jsonPath("$.balance", is(10)))
                 .andExpect(jsonPath("$.links[*].href", hasItem(endsWith("/addresses/testAddress"))));
 
         verify(p2shAddressesRepository).createNew(listStringCaptor.capture(), anyInt());

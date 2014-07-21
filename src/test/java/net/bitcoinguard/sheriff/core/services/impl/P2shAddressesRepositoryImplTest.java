@@ -50,6 +50,7 @@ public class P2shAddressesRepositoryImplTest {
         for (Key addressKey : addressKeys) {
             assertThat(keys, hasItem(addressKey.getPublicKey()));
         }
+        assertThat(address.getBalance(),is(0L));
         verify(bitcoinMagicService).watchAddress("address");
     }
 

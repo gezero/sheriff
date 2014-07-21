@@ -71,6 +71,7 @@ public class AddressTest {
                 .andExpect(jsonPath("$.keys[*]", hasItem(requestAddress.getKeys().get(1))))
                 .andExpect(jsonPath("$.totalKeys", is(3)))
                 .andExpect(jsonPath("$.requiredKeys", is(2)))
+                .andExpect(jsonPath("$.balance", is(0)))
                 .andExpect(jsonPath("$.links[*].href", hasItem(containsString("/addresses/"))));
 
     }

@@ -12,7 +12,7 @@ public class P2shAddress {
     private String address;
     private String redeemScript;
     private List<Key> keys;
-    private Long balance;
+    private Long balance = 0L;
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
