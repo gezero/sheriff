@@ -3,7 +3,7 @@ package net.bitcoinguard.sheriff.core.services.impl;
 import net.bitcoinguard.sheriff.core.entities.Key;
 import net.bitcoinguard.sheriff.core.entities.P2shAddress;
 import net.bitcoinguard.sheriff.core.entities.Transaction;
-import net.bitcoinguard.sheriff.core.services.BitcoinMagicService;
+import net.bitcoinguard.sheriff.bitcoin.service.BitcoinMagicService;
 import net.bitcoinguard.sheriff.core.services.KeysRepository;
 import org.junit.Before;
 import org.junit.Test;

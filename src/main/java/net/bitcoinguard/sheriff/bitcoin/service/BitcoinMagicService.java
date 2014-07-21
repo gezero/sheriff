@@ -1,4 +1,4 @@
-package net.bitcoinguard.sheriff.core.services;
+package net.bitcoinguard.sheriff.bitcoin.service;
 
 import org.springframework.stereotype.Service;
 

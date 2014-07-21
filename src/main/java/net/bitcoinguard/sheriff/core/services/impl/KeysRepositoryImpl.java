@@ -1,7 +1,7 @@
 package net.bitcoinguard.sheriff.core.services.impl;
 
 import net.bitcoinguard.sheriff.core.entities.Key;
-import net.bitcoinguard.sheriff.core.services.BitcoinMagicService;
+import net.bitcoinguard.sheriff.bitcoin.service.BitcoinMagicService;
 import net.bitcoinguard.sheriff.core.services.KeysRepositoryCustom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

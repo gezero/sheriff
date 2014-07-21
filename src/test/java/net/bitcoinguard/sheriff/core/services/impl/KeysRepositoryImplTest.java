@@ -1,7 +1,7 @@
 package net.bitcoinguard.sheriff.core.services.impl;
 
 import net.bitcoinguard.sheriff.core.entities.Key;
-import net.bitcoinguard.sheriff.core.services.BitcoinMagicService;
+import net.bitcoinguard.sheriff.bitcoin.service.BitcoinMagicService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;

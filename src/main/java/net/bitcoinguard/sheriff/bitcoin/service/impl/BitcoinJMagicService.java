@@ -1,9 +1,9 @@
-package net.bitcoinguard.sheriff.core.services.impl;
+package net.bitcoinguard.sheriff.bitcoin.service.impl;
 
 import com.google.bitcoin.core.*;
 import com.google.bitcoin.script.Script;
 import com.google.bitcoin.script.ScriptBuilder;
-import net.bitcoinguard.sheriff.core.services.BitcoinMagicService;
+import net.bitcoinguard.sheriff.bitcoin.service.BitcoinMagicService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

@@ -5,6 +5,7 @@ import com.google.bitcoin.params.TestNet3Params;
 import com.google.bitcoin.script.Script;
 import com.google.bitcoin.script.ScriptChunk;
 import com.google.bitcoin.script.ScriptOpCodes;
+import net.bitcoinguard.sheriff.bitcoin.service.impl.BitcoinJMagicService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.*;

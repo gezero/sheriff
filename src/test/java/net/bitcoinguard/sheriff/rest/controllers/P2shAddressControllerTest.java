@@ -5,7 +5,7 @@ import net.bitcoinguard.sheriff.core.entities.P2shAddress;
 import net.bitcoinguard.sheriff.core.entities.Transaction;
 import net.bitcoinguard.sheriff.core.services.KeysRepositoryCustom;
 import net.bitcoinguard.sheriff.core.services.P2shAddressesRepository;
-import net.bitcoinguard.sheriff.core.services.impl.BitcoinJMagicService;
+import net.bitcoinguard.sheriff.bitcoin.service.impl.BitcoinJMagicService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.*;
