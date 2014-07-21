@@ -6,7 +6,6 @@ import com.google.bitcoin.core.ECKey;
 import com.google.bitcoin.core.Utils;
 import net.bitcoinguard.sheriff.rest.controllers.P2shAddressController;
 import net.bitcoinguard.sheriff.rest.entities.P2shAddressResource;
-import net.bitcoinguard.sheriff.rest.entities.TransactionResource;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -26,7 +25,6 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -35,12 +33,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * Created by Jiri on 11. 7. 2014.
+ * Created by Jiri on 21. 7. 2014.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
 @WebAppConfiguration
-public class AddressTest {
+public class AddressWalletTest extends WalletTests {
     @Autowired
     private WebApplicationContext context;
     MockMvc mockMvc;
@@ -74,13 +72,11 @@ public class AddressTest {
                 .andExpect(jsonPath("$.links[*].href", hasItem(containsString("/addresses/"))));
 
     }
-
     private String prepareRequest(Object request) throws IOException {
         StringWriter writer = new StringWriter();
         mapper.writeValue(writer, request);
         return writer.toString();
     }
-
     private P2shAddressResource addressRequest() {
         ECKey key1 = new ECKey();
         ECKey key2 = new ECKey();
@@ -93,42 +89,31 @@ public class AddressTest {
         return request;
     }
 
+    private <T> T getContent(MvcResult mvcResult, Class<T> cls) throws IOException {
+        return mapper.readValue(mvcResult.getResponse().getContentAsString(), cls);
+    }
 
     @Test
-    public void createNewTransaction() throws Exception {
+    @Ignore("test is using coins")
+    public void checkBalance() throws Exception {
         P2shAddressResource request = addressRequest();
 
         MvcResult mvcResult = mockMvc.perform(post("/rest/addresses")
                         .content(prepareRequest(request))
                         .contentType(MediaType.APPLICATION_JSON)
         ).andReturn();
+        P2shAddressResource address = getContent(mvcResult, P2shAddressResource.class);
 
-        P2shAddressResource address1 = getContent(mvcResult, P2shAddressResource.class);
 
-        request = addressRequest();
-        mvcResult = mockMvc.perform(post("/rest/addresses")
-                        .content(prepareRequest(request))
-                        .contentType(MediaType.APPLICATION_JSON)
-        ).andReturn();
-        P2shAddressResource address2 = getContent(mvcResult, P2shAddressResource.class);
+        mockMvc.perform(get("/rest/addresses/" + address.getAddress()))
+                .andDo(print())
+                .andExpect(jsonPath("$.balance", is(0)));
 
-        assertThat(address1.getAddress(), is(not(address2.getAddress())));
+        sendMoneyToAddress(MINIMUM_TO_SEND,address.getAddress());
 
-        TransactionResource transactionRequest = new TransactionResource();
-        transactionRequest.setTargetAddress(address2.getAddress());
-        transactionRequest.setAmount(1000L);
-        mvcResult = mockMvc.perform(post("/rest/addresses/" + address1.getAddress() + "/transactions")
-                        .content(prepareRequest(transactionRequest))
-                        .contentType(MediaType.APPLICATION_JSON)
-        ).andReturn();
-
-        TransactionResource transaction = getContent(mvcResult, TransactionResource.class);
-        assertThat(transaction.getAmount(), is(transactionRequest.getAmount()));
-        assertThat(transaction.getSourceAddress(), is(address1.getAddress()));
-        assertThat(transaction.getTargetAddress(), is(address2.getAddress()));
+        mockMvc.perform(get("/rest/addresses/" + address.getAddress()))
+                .andDo(print())
+                .andExpect(jsonPath("$.balance", is(MINIMUM_TO_SEND.longValue())));
     }
 
-    private <T> T getContent(MvcResult mvcResult, Class<T> cls) throws IOException {
-        return mapper.readValue(mvcResult.getResponse().getContentAsString(), cls);
-    }
 }
