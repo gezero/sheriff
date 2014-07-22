@@ -13,6 +13,7 @@ public class P2shAddress {
     private String redeemScript;
     private List<Key> keys;
     private Long balance = 0L;
+    private List<Transaction> transactions;
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -56,5 +57,14 @@ public class P2shAddress {
 
     public void setBalance(Long balance) {
         this.balance = balance;
+    }
+
+    @OneToMany(cascade=CascadeType.ALL, mappedBy="sourceAddress")
+    public List<Transaction> getTransactions() {
+        return transactions;
+    }
+
+    public void setTransactions(List<Transaction> transactions) {
+        this.transactions = transactions;
     }
 }

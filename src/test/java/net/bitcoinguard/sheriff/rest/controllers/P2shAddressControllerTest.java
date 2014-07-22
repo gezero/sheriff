@@ -146,6 +146,7 @@ public class P2shAddressControllerTest {
 
 
         P2shAddress address = new P2shAddress();
+        transactionWithId.setSourceAddress(address);
 
         when(p2shAddressesRepository.findByAddress("sourceAddress")).thenReturn(address);
         when(p2shAddressesRepository.createNewTransaction(address, transaction.getTargetAddress(), transaction.getAmount())).thenReturn(transaction);

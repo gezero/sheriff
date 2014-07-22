@@ -116,4 +116,11 @@ public class BitcoinJMagicService implements BitcoinMagicService {
     public Long getBalance(String address) {
         return null;
     }
+
+    @Override
+    public String addSignature(String rawTransaction, String privateKey) {
+        return null;
+    }
+
+
 }

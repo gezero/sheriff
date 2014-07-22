@@ -1,7 +1,6 @@
 package net.bitcoinguard.sheriff.rest.entities.asm;
 
 import net.bitcoinguard.sheriff.core.entities.Transaction;
-import net.bitcoinguard.sheriff.rest.controllers.P2shAddressController;
 import net.bitcoinguard.sheriff.rest.controllers.TransactionController;
 import net.bitcoinguard.sheriff.rest.entities.TransactionResource;
 import org.springframework.hateoas.Link;
@@ -23,7 +22,8 @@ public class TransactionResourceAsm extends ResourceAssemblerSupport<Transaction
         TransactionResource resource = new TransactionResource();
         resource.setAmount(entity.getAmount());
         resource.setTargetAddress(entity.getTargetAddress());
-        resource.setSourceAddress(entity.getSourceAddrees());
+        resource.setSourceAddress(entity.getSourceAddress().getAddress());
+        resource.setRawTransaction(entity.getRawTransaction());
         Link link = linkTo(methodOn(TransactionController.class).getTransaction(entity.getId())).withSelfRel();
         //todo: add links to other entities in transaction
         resource.add(link);

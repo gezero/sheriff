@@ -3,8 +3,11 @@ package net.bitcoinguard.sheriff;
 import com.bitcoinj.wallet.WalletTests;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.bitcoin.core.ECKey;
+import com.google.bitcoin.core.Transaction;
 import com.google.bitcoin.core.Utils;
-import net.bitcoinguard.sheriff.core.entities.Transaction;
+import com.google.bitcoin.crypto.TransactionSignature;
+import com.google.bitcoin.script.Script;
+import com.google.bitcoin.script.ScriptBuilder;
 import net.bitcoinguard.sheriff.rest.controllers.P2shAddressController;
 import net.bitcoinguard.sheriff.rest.entities.P2shAddressResource;
 import net.bitcoinguard.sheriff.rest.entities.TransactionResource;
@@ -29,7 +32,6 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -52,6 +54,7 @@ public class AddressWalletTest extends WalletTests {
 
     @Autowired
     private P2shAddressController p2shAddressController;
+    private ECKey keyForSigning;
 
     @Before
     public void setUp() {
@@ -76,18 +79,20 @@ public class AddressWalletTest extends WalletTests {
                 .andExpect(jsonPath("$.links[*].href", hasItem(containsString("/addresses/"))));
 
     }
+
     private String prepareRequest(Object request) throws IOException {
         StringWriter writer = new StringWriter();
         mapper.writeValue(writer, request);
         return writer.toString();
     }
+
     private P2shAddressResource addressRequest() {
-        ECKey key1 = new ECKey();
+        keyForSigning = new ECKey();
         ECKey key2 = new ECKey();
 
         P2shAddressResource request = new P2shAddressResource();
         List<String> keys = new ArrayList<>();
-        keys.add(Utils.HEX.encode(key1.getPubKey()));
+        keys.add(Utils.HEX.encode(keyForSigning.getPubKey()));
         keys.add(Utils.HEX.encode(key2.getPubKey()));
         request.setKeys(keys);
         return request;
@@ -113,13 +118,13 @@ public class AddressWalletTest extends WalletTests {
                 .andDo(print())
                 .andExpect(jsonPath("$.balance", is(0)));
 
-        sendMoneyToAddress(MINIMUM_TO_SEND,address.getAddress());
+        sendMoneyToAddress(MINIMUM_TO_SEND, address.getAddress());
 
         Thread.sleep(10000);
 
         mockMvc.perform(get("/rest/addresses/" + address.getAddress()))
                 .andDo(print())
-                .andExpect(jsonPath("$.balance", is((int)MINIMUM_TO_SEND.longValue())));
+                .andExpect(jsonPath("$.balance", is((int) MINIMUM_TO_SEND.longValue())));
 
         TransactionResource transactionRequest = new TransactionResource();
         String targetAddress = freshAddress().toString();
@@ -135,6 +140,39 @@ public class AddressWalletTest extends WalletTests {
         assertThat(transaction.getSourceAddress(), is(address.getAddress()));
         assertThat(transaction.getTargetAddress(), is(targetAddress));
 
+        transaction.getId();
+
+
+        com.google.bitcoin.core.Transaction btcTransaction = new com.google.bitcoin.core.Transaction(params(), Utils.HEX.decode(transaction.getRawTransaction()));
+
+        signTransaction(btcTransaction, keyForSigning, address.getRedeemScript());
+
+        transaction.setRawTransaction(Utils.HEX.encode(btcTransaction.bitcoinSerialize()));
+
+
+        mvcResult = mockMvc.perform(post("/rest/transactions/"+transaction.getId())
+                        .content(prepareRequest(transaction))
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andReturn();
+
+        transaction = getContent(mvcResult, TransactionResource.class);
+
+    }
+
+    private void signTransaction(Transaction spendingTransaction, ECKey key1, CharSequence multiSignatureRedeemScript) {
+
+        for (int i = 0; i < spendingTransaction.getInputs().size(); ++i) {
+            TransactionSignature signature1 = spendingTransaction.calculateSignature(i, key1, Utils.HEX.decode(multiSignatureRedeemScript), Transaction.SigHash.ALL, true);
+
+            ScriptBuilder builder = new ScriptBuilder();
+            builder.smallNum(0);
+            builder.data(signature1.encodeToBitcoin());
+            byte[] redeemScriptBytes = Utils.HEX.decode(multiSignatureRedeemScript);
+            Script redeemScript = new Script(redeemScriptBytes);
+            builder.data(redeemScript.getProgram());
+            Script p2SHMultiSigInputScript = builder.build();
+            spendingTransaction.getInput(i).setScriptSig(p2SHMultiSigInputScript);
+        }
     }
 
 

@@ -9,6 +9,7 @@ public class TransactionResource extends ResourceSupport {
     private String targetAddress;
     private Long amount;
     private String sourceAddress;
+    private String rawTransaction;
 
     public String getTargetAddress() {
         return targetAddress;
@@ -32,5 +33,13 @@ public class TransactionResource extends ResourceSupport {
 
     public String getSourceAddress() {
         return sourceAddress;
+    }
+
+    public void setRawTransaction(String rawTransaction) {
+        this.rawTransaction = rawTransaction;
+    }
+
+    public String getRawTransaction() {
+        return rawTransaction;
     }
 }

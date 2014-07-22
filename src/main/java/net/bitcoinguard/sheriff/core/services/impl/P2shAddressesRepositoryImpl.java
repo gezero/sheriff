@@ -48,7 +48,7 @@ public class P2shAddressesRepositoryImpl implements P2shAddressesRepositoryCusto
         transaction.setAmount(amount);
         transaction.setRawTransaction(bitcoinMagicService.createTransaction(address.getAddress(),targetAddress,amount));
         transaction.setTargetAddress(targetAddress);
-        transaction.setSourceAddrees(address.getAddress());
+        transaction.setSourceAddress(address);
         return transaction;
     }
 }

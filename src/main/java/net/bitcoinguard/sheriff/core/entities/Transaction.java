@@ -1,9 +1,6 @@
 package net.bitcoinguard.sheriff.core.entities;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 /**
  * Created by Jiri on 9. 7. 2014.
@@ -14,7 +11,7 @@ public class Transaction {
     String rawTransaction;
     private Long amount;
     private String targetAddress;
-    private String sourceAddrees;
+    private P2shAddress sourceAddress;
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -50,11 +47,12 @@ public class Transaction {
         this.targetAddress = targetAddress;
     }
 
-    public String getSourceAddrees() {
-        return sourceAddrees;
+    @ManyToOne
+    public P2shAddress getSourceAddress() {
+        return sourceAddress;
     }
 
-    public void setSourceAddrees(String sourceAddrees) {
-        this.sourceAddrees = sourceAddrees;
+    public void setSourceAddress(P2shAddress sourceAddress) {
+        this.sourceAddress = sourceAddress;
     }
 }

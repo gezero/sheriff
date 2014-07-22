@@ -63,7 +63,7 @@ public class P2shAddressesRepositoryImplTest {
         address.setAddress("sourceAddress");
         Transaction transaction = addressesRepository.createNewTransaction(address, "targetAddress", 1000L);
         assertThat(transaction.getAmount(),is(1000L));
-        assertThat(transaction.getSourceAddrees(),is(address.getAddress()));
+        assertThat(transaction.getSourceAddress().getAddress(),is(address.getAddress()));
         assertThat(transaction.getTargetAddress(),is("targetAddress"));
         assertThat(transaction.getRawTransaction(),is("rawTransaction"));
 

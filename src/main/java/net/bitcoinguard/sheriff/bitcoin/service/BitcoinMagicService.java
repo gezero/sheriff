@@ -30,4 +30,6 @@ public interface BitcoinMagicService {
     void watchAddress(String address);
 
     Long getBalance(String address);
+
+    String addSignature(String rawTransaction, String privateKey);
 }
