@@ -4,6 +4,7 @@ import net.bitcoinguard.sheriff.bitcoin.service.impl.BitcoinJMagicService;
 import net.bitcoinguard.sheriff.core.entities.Key;
 import net.bitcoinguard.sheriff.core.entities.P2shAddress;
 import net.bitcoinguard.sheriff.core.entities.Transaction;
+import net.bitcoinguard.sheriff.core.services.P2shAddressesRepository;
 import net.bitcoinguard.sheriff.core.services.TransactionsRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +20,9 @@ import java.io.StringWriter;
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -35,6 +38,8 @@ public class TransactionControllerTest {
 
     @Mock
     TransactionsRepository transactionsRepository;
+    @Mock
+    P2shAddressesRepository p2shAddressesRepository;
     @Mock
     BitcoinJMagicService bitcoinJMagicService;
 
@@ -63,6 +68,50 @@ public class TransactionControllerTest {
                 .andExpect(jsonPath("$.rawTransaction", is("rawTransaction")))
                 .andExpect(jsonPath("$.links[*].href", hasItem(endsWith("/transactions/1"))));
     }
+
+    @Test
+    public void testCreateTransaction() throws Exception{
+        Transaction transaction = createTransaction();
+        Transaction transactionWithId = createTransaction();
+        transactionWithId.setId(1L);
+
+
+        P2shAddress address = new P2shAddress();
+        transactionWithId.setSourceAddress(address);
+
+        when(p2shAddressesRepository.findByAddress("sourceAddress")).thenReturn(address);
+        when(p2shAddressesRepository.createNewTransaction(address, transaction.getTargetAddress(), transaction.getAmount())).thenReturn(transaction);
+        when(transactionsRepository.save(transaction)).thenReturn(transactionWithId);
+
+        mockMvc.perform(put("/rest/transactions")
+                        .content("{\"amount\":10000,\"sourceAddress\":\"sourceAddress\",\"targetAddress\":\"targetAddress\"}")
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.links[*].href", hasItem(endsWith("/transactions/1"))));
+        verify(transactionsRepository).save(transaction);
+    }
+
+    private Transaction createTransaction() {
+        Transaction transaction = new Transaction();
+        transaction.setTargetAddress("targetAddress");
+        transaction.setAmount(10000L);
+        transaction.setRawTransaction("rawTransaction");
+        return transaction;
+    }
+
+    @Test
+    public void testCanCreateTransactionOnlyOnExistingAddress() throws Exception{
+
+        mockMvc.perform(put("/rest/transactions")
+                        .content("{\"amount\":10000,\"sourceAddress\":\"sourceAddress\",\"targetAddress\":\"targetAddress\"}")
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
 
     @Test
     public void testSignTransaction() throws Exception {

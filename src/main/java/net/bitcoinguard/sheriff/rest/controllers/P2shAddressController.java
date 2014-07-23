@@ -59,7 +59,7 @@ public class P2shAddressController {
         if (newAddress.getKeys() == null) {
             throw new NoKeysProvidedException();
         }
-        if ( newAddress.getKeys().size() >= newAddress.getTotalKeys()) {
+        if (newAddress.getKeys().size() >= newAddress.getTotalKeys()) {
             throw new ToManyKeysException();
         }
         for (int i = newAddress.getKeys().size(); i < newAddress.getTotalKeys(); i++) {
@@ -73,20 +73,5 @@ public class P2shAddressController {
         headers.setLocation(URI.create(p2shAddressResource.getLink("self").getHref()));
         return new ResponseEntity<>(p2shAddressResource, headers, HttpStatus.CREATED);
     }
-
-    @RequestMapping(value = "/{addressString}/transactions", method = RequestMethod.POST)
-    public
-    @ResponseBody
-    ResponseEntity<TransactionResource> createTransaction(@PathVariable String addressString, @RequestBody TransactionResource transactionResource) {
-        P2shAddress address = p2shAddressesRepository.findByAddress(addressString);
-        if (address == null){
-            throw new AddressNotFoundException();
-        }
-        Transaction transaction = p2shAddressesRepository.createNewTransaction(address, transactionResource.getTargetAddress(), transactionResource.getAmount());
-        transaction = transactionsRepository.save(transaction);
-        TransactionResource resource = new TransactionResourceAsm().toResource(transaction);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(URI.create(resource.getLink("self").getHref()));
-        return new ResponseEntity<>(resource, headers, HttpStatus.CREATED);
-    }
 }
+

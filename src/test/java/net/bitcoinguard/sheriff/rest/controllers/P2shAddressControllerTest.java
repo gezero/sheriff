@@ -139,49 +139,6 @@ public class P2shAddressControllerTest {
     }
 
     @Test
-    public void testCreateTransaction() throws Exception{
-        Transaction transaction = createTransaction();
-        Transaction transactionWithId = createTransaction();
-        transactionWithId.setId(1L);
-
-
-        P2shAddress address = new P2shAddress();
-        transactionWithId.setSourceAddress(address);
-
-        when(p2shAddressesRepository.findByAddress("sourceAddress")).thenReturn(address);
-        when(p2shAddressesRepository.createNewTransaction(address, transaction.getTargetAddress(), transaction.getAmount())).thenReturn(transaction);
-        when(transactionsRepository.save(transaction)).thenReturn(transactionWithId);
-
-        mockMvc.perform(post("/rest/addresses/sourceAddress/transactions")
-                        .content("{\"amount\":10000,\"targetAddress\":\"targetAddress\"}")
-                        .contentType(MediaType.APPLICATION_JSON)
-        )
-                .andDo(print())
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.links[*].href", hasItem(endsWith("/transactions/1"))));
-        verify(transactionsRepository).save(transaction);
-    }
-
-    private Transaction createTransaction() {
-        Transaction transaction = new Transaction();
-        transaction.setTargetAddress("targetAddress");
-        transaction.setAmount(10000L);
-        transaction.setRawTransaction("rawTransaction");
-        return transaction;
-    }
-
-    @Test
-    public void testCanCreateTransactionOnlyOnExistingAddress() throws Exception{
-
-        mockMvc.perform(post("/rest/addresses/sourceAddress/transactions")
-                        .content("{\"amount\":10000,\"targetAddress\":\"targetAddress\"}")
-                        .contentType(MediaType.APPLICATION_JSON)
-        )
-                .andDo(print())
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
     public void testNothingInRequest() throws Exception {
         mockMvc
                 .perform(post("/rest/addresses")

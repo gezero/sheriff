@@ -2,15 +2,22 @@ package net.bitcoinguard.sheriff.rest.controllers;
 
 import net.bitcoinguard.sheriff.bitcoin.service.impl.BitcoinJMagicService;
 import net.bitcoinguard.sheriff.core.entities.Key;
+import net.bitcoinguard.sheriff.core.entities.P2shAddress;
 import net.bitcoinguard.sheriff.core.entities.Transaction;
+import net.bitcoinguard.sheriff.core.services.P2shAddressesRepository;
 import net.bitcoinguard.sheriff.core.services.TransactionsRepository;
 import net.bitcoinguard.sheriff.rest.entities.TransactionResource;
 import net.bitcoinguard.sheriff.rest.entities.asm.TransactionResourceAsm;
+import net.bitcoinguard.sheriff.rest.exceptions.AddressNotFoundException;
 import net.bitcoinguard.sheriff.rest.exceptions.NotFoundException;
 import net.bitcoinguard.sheriff.rest.exceptions.SomehtingGotWrongException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -20,11 +27,13 @@ import java.util.List;
 public class TransactionController {
     TransactionsRepository transactionsRepository;
     BitcoinJMagicService bitcoinJMagicService;
+    P2shAddressesRepository p2shAddressesRepository;
 
     @Autowired
-    public TransactionController(TransactionsRepository transactionsRepository, BitcoinJMagicService bitcoinJMagicService) {
+    public TransactionController(TransactionsRepository transactionsRepository, BitcoinJMagicService bitcoinJMagicService, P2shAddressesRepository p2shAddressesRepository) {
         this.transactionsRepository = transactionsRepository;
         this.bitcoinJMagicService = bitcoinJMagicService;
+        this.p2shAddressesRepository = p2shAddressesRepository;
     }
 
     @RequestMapping(value = "/{transactionId}", method = RequestMethod.GET)
@@ -36,6 +45,22 @@ public class TransactionController {
             throw new NotFoundException();
         }
         return new TransactionResourceAsm().toResource(transaction);
+    }
+
+    @RequestMapping(value = "", method = RequestMethod.PUT)
+    public
+    @ResponseBody
+    ResponseEntity<TransactionResource> createTransaction(@RequestBody TransactionResource transactionResource) {
+        P2shAddress address = p2shAddressesRepository.findByAddress(transactionResource.getSourceAddress());
+        if (address == null) {
+            throw new AddressNotFoundException();
+        }
+        Transaction transaction = p2shAddressesRepository.createNewTransaction(address, transactionResource.getTargetAddress(), transactionResource.getAmount());
+        transaction = transactionsRepository.save(transaction);
+        TransactionResource resource = new TransactionResourceAsm().toResource(transaction);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create(resource.getLink("self").getHref()));
+        return new ResponseEntity<>(resource, headers, HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/{transactionId}", method = RequestMethod.POST)

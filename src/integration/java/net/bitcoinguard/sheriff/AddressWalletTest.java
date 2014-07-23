@@ -130,7 +130,7 @@ public class AddressWalletTest extends WalletTests {
         String targetAddress = freshAddress().toString();
         transactionRequest.setTargetAddress(targetAddress);
         transactionRequest.setAmount(MINIMUM_TO_SEND.subtract(com.google.bitcoin.core.Transaction.REFERENCE_DEFAULT_MIN_TX_FEE).longValue());
-        mvcResult = mockMvc.perform(post("/rest/addresses/" + address.getAddress() + "/transactions")
+        mvcResult = mockMvc.perform(post("/rest/transactions")
                         .content(prepareRequest(transactionRequest))
                         .contentType(MediaType.APPLICATION_JSON)
         ).andReturn();
