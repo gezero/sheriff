@@ -83,7 +83,7 @@ public class TransactionControllerTest {
         when(p2shAddressesRepository.createNewTransaction(address, transaction.getTargetAddress(), transaction.getAmount())).thenReturn(transaction);
         when(transactionsRepository.save(transaction)).thenReturn(transactionWithId);
 
-        mockMvc.perform(put("/rest/transactions")
+        mockMvc.perform(post("/rest/transactions")
                         .content("{\"amount\":10000,\"sourceAddress\":\"sourceAddress\",\"targetAddress\":\"targetAddress\"}")
                         .contentType(MediaType.APPLICATION_JSON)
         )
@@ -104,7 +104,7 @@ public class TransactionControllerTest {
     @Test
     public void testCanCreateTransactionOnlyOnExistingAddress() throws Exception{
 
-        mockMvc.perform(put("/rest/transactions")
+        mockMvc.perform(post("/rest/transactions")
                         .content("{\"amount\":10000,\"sourceAddress\":\"sourceAddress\",\"targetAddress\":\"targetAddress\"}")
                         .contentType(MediaType.APPLICATION_JSON)
         )

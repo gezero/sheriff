@@ -34,6 +34,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -150,7 +151,7 @@ public class AddressWalletTest extends WalletTests {
         transaction.setRawTransaction(Utils.HEX.encode(btcTransaction.bitcoinSerialize()));
 
 
-        mvcResult = mockMvc.perform(post("/rest/transactions/"+transaction.getId())
+        mvcResult = mockMvc.perform(post("/rest/transactions/" + transaction.getId())
                         .content(prepareRequest(transaction))
                         .contentType(MediaType.APPLICATION_JSON)
         ).andReturn();

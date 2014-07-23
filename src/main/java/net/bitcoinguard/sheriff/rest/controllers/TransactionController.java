@@ -47,7 +47,7 @@ public class TransactionController {
         return new TransactionResourceAsm().toResource(transaction);
     }
 
-    @RequestMapping(value = "", method = RequestMethod.PUT)
+    @RequestMapping(value = "", method = RequestMethod.POST)
     public
     @ResponseBody
     ResponseEntity<TransactionResource> createTransaction(@RequestBody TransactionResource transactionResource) {
