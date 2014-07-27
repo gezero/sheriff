@@ -1,10 +1,13 @@
 package net.bitcoinguard.sheriff.core.services.impl;
 
 import com.google.bitcoin.core.*;
+import com.google.bitcoin.crypto.TransactionSignature;
 import com.google.bitcoin.params.TestNet3Params;
 import com.google.bitcoin.script.Script;
+import com.google.bitcoin.script.ScriptBuilder;
 import com.google.bitcoin.script.ScriptChunk;
 import com.google.bitcoin.script.ScriptOpCodes;
+import net.bitcoinguard.sheriff.bitcoin.service.BitcoinMagicService;
 import net.bitcoinguard.sheriff.bitcoin.service.impl.BitcoinJMagicService;
 import org.junit.Before;
 import org.junit.Test;
@@ -153,6 +156,7 @@ public class BitcoinJMagicServiceTest {
         assertThat(inputTotal.subtract(Transaction.REFERENCE_DEFAULT_MIN_TX_FEE),is(outputTotal));
     }
 
+
     private List<TransactionOutput> watchedOutput(Address address, Address address2) {
         Transaction transaction = new Transaction(networkParameters);
         transaction.addOutput(new TransactionOutput(networkParameters,transaction,Coin.MILLICOIN.divide(2),address));
@@ -165,5 +169,47 @@ public class BitcoinJMagicServiceTest {
         List<TransactionOutput> list = new LinkedList<>(transaction2.getOutputs());
         list.addAll(transaction.getOutputs());
         return list;
+    }
+
+    @Test
+    private void testAddSignature() throws Exception{
+        Map<String, String> pair1 = bitcoinJMagicService.generateKeyPair();
+        Map<String, String> pair2 = bitcoinJMagicService.generateKeyPair();
+        Map<String, String> pair3 = bitcoinJMagicService.generateKeyPair();
+
+        List<String> keys = new ArrayList<>();
+        keys.add(pair1.get(BitcoinMagicService.PUBLIC_KEY));
+        keys.add(pair2.get(BitcoinMagicService.PUBLIC_KEY));
+        keys.add(pair3.get(BitcoinMagicService.PUBLIC_KEY));
+
+        String multiSignatureRedeemScript = bitcoinJMagicService.createMultiSignatureRedeemScript(keys, 2);
+
+        String p2shaddress = bitcoinJMagicService.getAddressFromRedeemScript(multiSignatureRedeemScript);
+
+        Transaction transaction = new Transaction(networkParameters);
+        TransactionOutput output = transaction.addOutput(Coin.MILLICOIN, new Address(networkParameters, p2shaddress));
+
+
+        Transaction spendingTransaction = new Transaction(networkParameters);
+        spendingTransaction.addInput(output);
+        spendingTransaction.addOutput(Coin.MICROCOIN, ECKey.fromPublicOnly(Utils.HEX.decode(pair1.get(BitcoinJMagicService.PUBLIC_KEY))));
+
+        TransactionSignature signature1 = spendingTransaction.calculateSignature(0, ECKey.fromPrivate(Utils.HEX.decode(pair1.get(BitcoinJMagicService.PRIVATE_KEY))), Utils.HEX.decode(multiSignatureRedeemScript), Transaction.SigHash.ALL, true);
+
+        ScriptBuilder builder = new ScriptBuilder();
+        builder.smallNum(0);
+        builder.data(signature1.encodeToBitcoin());
+        byte[] redeemScriptBytes = Utils.HEX.decode(multiSignatureRedeemScript);
+        Script redeemScript = new Script(redeemScriptBytes);
+        builder.data(redeemScript.getProgram());
+        Script p2SHMultiSigInputScript = builder.build();
+        spendingTransaction.getInput(0).setScriptSig(p2SHMultiSigInputScript);
+
+
+
+        String rawSignedTransaction = bitcoinJMagicService.addSignature(Utils.HEX.encode(spendingTransaction.bitcoinSerialize()), pair2.get(BitcoinJMagicService.PRIVATE_KEY));
+
+        Transaction signedTransaction = new Transaction(networkParameters,Utils.HEX.decode(rawSignedTransaction));
+
     }
 }

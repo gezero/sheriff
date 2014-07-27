@@ -39,7 +39,7 @@ public class BitcoinJEventListener implements WalletEventListener {
     }
 
     private void updateAddresses(Wallet wallet, List<Address> addressesToUpdate) {
-        LinkedList<TransactionOutput> watchedOutputs = wallet.getWatchedOutputs(true);
+        List<TransactionOutput> watchedOutputs = wallet.getWatchedOutputs(true);
         Map<Address, Coin> balances = new HashMap<>();
         for (TransactionOutput watchedOutput : watchedOutputs) {
             Address toAddress = watchedOutput.getScriptPubKey().getToAddress(params);

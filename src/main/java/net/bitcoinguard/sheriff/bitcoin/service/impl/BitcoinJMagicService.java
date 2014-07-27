@@ -86,7 +86,7 @@ public class BitcoinJMagicService implements BitcoinMagicService {
     }
 
     private Coin addInputs(Transaction transaction, Address sourceAddress, Coin amount) {
-        LinkedList<TransactionOutput> watchedOutputs = wallet.getWatchedOutputs(true);
+        List<TransactionOutput> watchedOutputs = wallet.getWatchedOutputs(true);
         Coin total = Coin.ZERO;
         for (TransactionOutput watchedOutput : watchedOutputs) {
             if (watchedOutput.getScriptPubKey().getToAddress(networkParams).equals(sourceAddress)) {
