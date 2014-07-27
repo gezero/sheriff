@@ -1,8 +1,10 @@
 package net.bitcoinguard.sheriff.bitcoin.service.impl;
 
 import com.google.bitcoin.core.*;
+import com.google.bitcoin.crypto.TransactionSignature;
 import com.google.bitcoin.script.Script;
 import com.google.bitcoin.script.ScriptBuilder;
+import com.google.bitcoin.script.ScriptChunk;
 import net.bitcoinguard.sheriff.bitcoin.exceptions.NotEnoughMoneyException;
 import net.bitcoinguard.sheriff.bitcoin.service.BitcoinMagicService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,7 +121,24 @@ public class BitcoinJMagicService implements BitcoinMagicService {
 
     @Override
     public String addSignature(String rawTransaction, String privateKey) {
-        return null;
+        Transaction transaction = new Transaction(networkParams,Utils.HEX.decode(rawTransaction));
+        ECKey ecKey = ECKey.fromPrivate(Utils.HEX.decode(privateKey));
+
+        for (TransactionInput transactionInput : transaction.getInputs()) {
+            Script scriptSig = transactionInput.getScriptSig();
+            Script redeemScript = new Script(scriptSig.getChunks().get(scriptSig.getChunks().size()-1).data);
+            TransactionSignature transactionSignature = transaction.calculateSignature(transaction.getInputs().indexOf(transactionInput), ecKey, redeemScript, Transaction.SigHash.ALL, true);
+            ScriptBuilder builder = new ScriptBuilder();
+            for (ScriptChunk scriptChunk : scriptSig.getChunks()) {
+                if (scriptSig.getChunks().indexOf(scriptChunk) == 2){
+                    builder.data(transactionSignature.encodeToBitcoin());
+                }
+                builder.addChunk(scriptChunk);
+            }
+            transactionInput.setScriptSig(builder.build());
+        }
+
+        return Utils.HEX.encode(transaction.bitcoinSerialize());
     }
 
 

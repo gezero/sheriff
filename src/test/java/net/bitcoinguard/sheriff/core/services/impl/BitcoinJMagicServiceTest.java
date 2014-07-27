@@ -172,7 +172,7 @@ public class BitcoinJMagicServiceTest {
     }
 
     @Test
-    private void testAddSignature() throws Exception{
+    public void testAddSignature() throws Exception{
         Map<String, String> pair1 = bitcoinJMagicService.generateKeyPair();
         Map<String, String> pair2 = bitcoinJMagicService.generateKeyPair();
         Map<String, String> pair3 = bitcoinJMagicService.generateKeyPair();
@@ -186,30 +186,50 @@ public class BitcoinJMagicServiceTest {
 
         String p2shaddress = bitcoinJMagicService.getAddressFromRedeemScript(multiSignatureRedeemScript);
 
-        Transaction transaction = new Transaction(networkParameters);
-        TransactionOutput output = transaction.addOutput(Coin.MILLICOIN, new Address(networkParameters, p2shaddress));
-
-
         Transaction spendingTransaction = new Transaction(networkParameters);
-        spendingTransaction.addInput(output);
-        spendingTransaction.addOutput(Coin.MICROCOIN, ECKey.fromPublicOnly(Utils.HEX.decode(pair1.get(BitcoinJMagicService.PUBLIC_KEY))));
-
-        TransactionSignature signature1 = spendingTransaction.calculateSignature(0, ECKey.fromPrivate(Utils.HEX.decode(pair1.get(BitcoinJMagicService.PRIVATE_KEY))), Utils.HEX.decode(multiSignatureRedeemScript), Transaction.SigHash.ALL, true);
-
-        ScriptBuilder builder = new ScriptBuilder();
-        builder.smallNum(0);
-        builder.data(signature1.encodeToBitcoin());
-        byte[] redeemScriptBytes = Utils.HEX.decode(multiSignatureRedeemScript);
-        Script redeemScript = new Script(redeemScriptBytes);
-        builder.data(redeemScript.getProgram());
-        Script p2SHMultiSigInputScript = builder.build();
-        spendingTransaction.getInput(0).setScriptSig(p2SHMultiSigInputScript);
+        {
+            Transaction transaction = new Transaction(networkParameters);
+            TransactionOutput output = transaction.addOutput(Coin.MILLICOIN, new Address(networkParameters, p2shaddress));
 
 
+            TransactionSignature transactionSignature;
+            Script redeemScript;
+            spendingTransaction.addInput(output);
+            spendingTransaction.addOutput(Coin.MICROCOIN, ECKey.fromPublicOnly(Utils.HEX.decode(pair1.get(BitcoinJMagicService.PUBLIC_KEY))));
+
+            transactionSignature = spendingTransaction.calculateSignature(0, ECKey.fromPrivate(Utils.HEX.decode(pair1.get(BitcoinJMagicService.PRIVATE_KEY))), Utils.HEX.decode(multiSignatureRedeemScript), Transaction.SigHash.ALL, true);
+
+            ScriptBuilder builder = new ScriptBuilder();
+            builder.smallNum(0);
+            builder.data(transactionSignature.encodeToBitcoin());
+            byte[] redeemScriptBytes = Utils.HEX.decode(multiSignatureRedeemScript);
+            redeemScript = new Script(redeemScriptBytes);
+            builder.data(redeemScript.getProgram());
+            Script p2SHMultiSigInputScript = builder.build();
+            spendingTransaction.getInput(0).setScriptSig(p2SHMultiSigInputScript);
+
+        }
 
         String rawSignedTransaction = bitcoinJMagicService.addSignature(Utils.HEX.encode(spendingTransaction.bitcoinSerialize()), pair2.get(BitcoinJMagicService.PRIVATE_KEY));
 
+        assertThat(rawSignedTransaction, is(notNullValue()));
         Transaction signedTransaction = new Transaction(networkParameters,Utils.HEX.decode(rawSignedTransaction));
 
+        TransactionInput input = signedTransaction.getInput(0);
+        Script scriptSig = input.getScriptSig();
+
+        Script redeemScript = new Script(scriptSig.getChunks().get(scriptSig.getChunks().size()-1).data);
+        Sha256Hash hash = signedTransaction.hashForSignature(0, redeemScript, Transaction.SigHash.ALL, true);
+
+        TransactionSignature transactionSignature1 = TransactionSignature.decodeFromBitcoin(scriptSig.getChunks().get(1).data, false);
+
+        ECKey.fromPublicOnly(Utils.HEX.decode(keys.get(0))).verify(hash, transactionSignature1);
+
+        TransactionSignature transactionSignature2 = TransactionSignature.decodeFromBitcoin(scriptSig.getChunks().get(2).data, false);
+
+        ECKey.fromPublicOnly(Utils.HEX.decode(keys.get(1))).verify(hash, transactionSignature2);
+
+
     }
+
 }
