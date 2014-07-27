@@ -43,6 +43,10 @@ public class P2shAddressesRepositoryImplTest {
 
         when(bitcoinMagicService.createMultiSignatureRedeemScript(keys, 2)).thenReturn("redeemScript");
         when(bitcoinMagicService.getAddressFromRedeemScript("redeemScript")).thenReturn("address");
+        Key testKey3 = new Key();
+        testKey3.setPublicKey("testKey3");
+        testKey3.setPrivateKey("testKey3PrivateKey");
+        when(keysRepository.findByPublicKey("testKey3")).thenReturn(testKey3);
         P2shAddress address = addressesRepository.createNew(keys, 2);
         assertThat(address.getRedeemScript(), is("redeemScript"));
         assertThat(address.getAddress(), is("address"));
