@@ -104,7 +104,7 @@ public class AddressWalletTest extends WalletTests {
     }
 
     @Test
-    @Ignore("test is using coins")
+//    @Ignore("test is using coins")
     public void testBasicTransaction() throws Exception {
         P2shAddressResource request = addressRequest();
 
@@ -130,11 +130,14 @@ public class AddressWalletTest extends WalletTests {
         TransactionResource transactionRequest = new TransactionResource();
         String targetAddress = freshAddress().toString();
         transactionRequest.setTargetAddress(targetAddress);
+        transactionRequest.setSourceAddress(address.getAddress());
         transactionRequest.setAmount(MINIMUM_TO_SEND.subtract(com.google.bitcoin.core.Transaction.REFERENCE_DEFAULT_MIN_TX_FEE).longValue());
         mvcResult = mockMvc.perform(post("/rest/transactions")
                         .content(prepareRequest(transactionRequest))
                         .contentType(MediaType.APPLICATION_JSON)
-        ).andReturn();
+        )
+                .andDo(print())
+                .andReturn();
 
         TransactionResource transaction = getContent(mvcResult, TransactionResource.class);
         assertThat(transaction.getAmount(), is(transactionRequest.getAmount()));
