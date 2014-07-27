@@ -2,15 +2,11 @@ package net.bitcoinguard.sheriff.rest.controllers;
 
 import net.bitcoinguard.sheriff.core.entities.Key;
 import net.bitcoinguard.sheriff.core.entities.P2shAddress;
-import net.bitcoinguard.sheriff.core.entities.Transaction;
-import net.bitcoinguard.sheriff.core.services.KeysRepositoryCustom;
+import net.bitcoinguard.sheriff.core.services.KeysRepository;
 import net.bitcoinguard.sheriff.core.services.P2shAddressesRepository;
 import net.bitcoinguard.sheriff.core.services.TransactionsRepository;
 import net.bitcoinguard.sheriff.rest.entities.P2shAddressResource;
-import net.bitcoinguard.sheriff.rest.entities.TransactionResource;
 import net.bitcoinguard.sheriff.rest.entities.asm.P2shAddressResourceAsm;
-import net.bitcoinguard.sheriff.rest.entities.asm.TransactionResourceAsm;
-import net.bitcoinguard.sheriff.rest.exceptions.AddressNotFoundException;
 import net.bitcoinguard.sheriff.rest.exceptions.NoKeysProvidedException;
 import net.bitcoinguard.sheriff.rest.exceptions.NotFoundException;
 import net.bitcoinguard.sheriff.rest.exceptions.ToManyKeysException;
@@ -30,11 +26,11 @@ import java.net.URI;
 @RequestMapping("/rest/addresses")
 public class P2shAddressController {
     P2shAddressesRepository p2shAddressesRepository;
-    KeysRepositoryCustom keysRepository;
+    KeysRepository keysRepository;
     TransactionsRepository transactionsRepository;
 
     @Autowired
-    public P2shAddressController(P2shAddressesRepository p2shAddressesRepository, KeysRepositoryCustom keysRepository, TransactionsRepository transactionsRepository) {
+    public P2shAddressController(P2shAddressesRepository p2shAddressesRepository, KeysRepository keysRepository, TransactionsRepository transactionsRepository) {
         this.p2shAddressesRepository = p2shAddressesRepository;
         this.keysRepository = keysRepository;
         this.transactionsRepository = transactionsRepository;
@@ -64,6 +60,7 @@ public class P2shAddressController {
         }
         for (int i = newAddress.getKeys().size(); i < newAddress.getTotalKeys(); i++) {
             Key key = keysRepository.generateNewKey();
+            key = keysRepository.save(key);
             newAddress.getKeys().add(key.getPublicKey());
         }
         P2shAddress address = p2shAddressesRepository.createNew(newAddress.getKeys(), newAddress.getRequiredKeys());

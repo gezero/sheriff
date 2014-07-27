@@ -3,6 +3,7 @@ package net.bitcoinguard.sheriff.rest.controllers;
 import net.bitcoinguard.sheriff.core.entities.Key;
 import net.bitcoinguard.sheriff.core.entities.P2shAddress;
 import net.bitcoinguard.sheriff.core.entities.Transaction;
+import net.bitcoinguard.sheriff.core.services.KeysRepository;
 import net.bitcoinguard.sheriff.core.services.KeysRepositoryCustom;
 import net.bitcoinguard.sheriff.core.services.P2shAddressesRepository;
 import net.bitcoinguard.sheriff.bitcoin.service.impl.BitcoinJMagicService;
@@ -41,7 +42,7 @@ public class P2shAddressControllerTest {
     @Mock
     TransactionsRepository transactionsRepository;
     @Mock
-    KeysRepositoryCustom keysRepository;
+    KeysRepository keysRepository;
     @Mock
     BitcoinJMagicService bitcoinJMagicService;
 
@@ -105,6 +106,7 @@ public class P2shAddressControllerTest {
     public void testCreateNewAddress() throws Exception {
 
         when(keysRepository.generateNewKey()).thenReturn(testKey);
+        when(keysRepository.save(testKey)).thenReturn(testKey);
         when(p2shAddressesRepository.createNew(anyListOf(String.class), any(Integer.class))).thenReturn(testAddress);
         when(p2shAddressesRepository.save(testAddress)).thenReturn(testAddress);
 
@@ -119,6 +121,7 @@ public class P2shAddressControllerTest {
                 .andExpect(jsonPath("$.balance", is(10)))
                 .andExpect(jsonPath("$.links[*].href", hasItem(endsWith("/addresses/testAddress"))));
 
+        verify(keysRepository).save(testKey);
         verify(p2shAddressesRepository).createNew(listStringCaptor.capture(), anyInt());
 
         List<String> keys = listStringCaptor.getValue();

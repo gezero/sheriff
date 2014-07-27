@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.hateoas.Link;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -144,8 +145,10 @@ public class AddressWalletTest extends WalletTests {
         assertThat(transaction.getSourceAddress(), is(address.getAddress()));
         assertThat(transaction.getTargetAddress(), is(targetAddress));
 
-        transaction.getId();
+        String href = transaction.getId().getHref();
 
+
+        String relativeHreff = href.substring(href.indexOf("/rest/transactions"));
 
         com.google.bitcoin.core.Transaction btcTransaction = new com.google.bitcoin.core.Transaction(params(), Utils.HEX.decode(transaction.getRawTransaction()));
 
@@ -154,10 +157,16 @@ public class AddressWalletTest extends WalletTests {
         transaction.setRawTransaction(Utils.HEX.encode(btcTransaction.bitcoinSerialize()));
 
 
-        mvcResult = mockMvc.perform(post("/rest/transactions/" + transaction.getId())
+        mvcResult = mockMvc.perform(post(relativeHreff)
                         .content(prepareRequest(transaction))
                         .contentType(MediaType.APPLICATION_JSON)
-        ).andReturn();
+        )
+                .andDo(print())
+                .andReturn();
+
+        if (mvcResult.getResolvedException()!= null){
+            mvcResult.getResolvedException().printStackTrace();
+        }
 
         transaction = getContent(mvcResult, TransactionResource.class);
 

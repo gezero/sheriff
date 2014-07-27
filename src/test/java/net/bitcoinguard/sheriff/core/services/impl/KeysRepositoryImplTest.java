@@ -1,7 +1,9 @@
 package net.bitcoinguard.sheriff.core.services.impl;
 
-import net.bitcoinguard.sheriff.core.entities.Key;
 import net.bitcoinguard.sheriff.bitcoin.service.BitcoinMagicService;
+import net.bitcoinguard.sheriff.bitcoin.service.impl.BitcoinJMagicService;
+import net.bitcoinguard.sheriff.core.entities.Key;
+import net.bitcoinguard.sheriff.core.services.KeysRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -12,7 +14,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class KeysRepositoryImplTest {
@@ -22,9 +26,11 @@ public class KeysRepositoryImplTest {
 
     @Mock
     BitcoinMagicService bitcoinMagicService;
+    @Mock
+    KeysRepository repository;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
     }
 
@@ -39,8 +45,9 @@ public class KeysRepositoryImplTest {
         when(bitcoinMagicService.generateKeyPair()).thenReturn(pair);
 
         Key key = keysRepository.generateNewKey();
-        assertThat(key.getPublicKey(),is(testPublicKey));
-        assertThat(key.getPrivateKey(),is(testPrivateKey));
+
+        assertThat(key.getPublicKey(), is(testPublicKey));
+        assertThat(key.getPrivateKey(), is(testPrivateKey));
 
     }
 }
