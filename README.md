@@ -53,7 +53,7 @@ with the Json content similar to this one:
     {
         "totalKeys":3,
         "requiredKeys":2,
-        "keys":["02c8064852f9e5d30e10997cdc4da43238016eeefbc20b439a8eb136546992786c","{"address":null,"redeemScript":null,"totalKeys":3,"requiredKeys":2,"balance":0,"keys":["02c8064852f9e5d30e10997cdc4da43238016eeefbc20b439a8eb136546992786c","034d6c013aa68cd2e0a7c247eef627586481c35eb00c7f2e1698d6a054059e0b52"]"]
+        "keys":["02c8064852f9e5d30e10997cdc4da43238016eeefbc20b439a8eb136546992786c","034d6c013aa68cd2e0a7c247eef627586481c35eb00c7f2e1698d6a054059e0b52"]"]
     }
     
 The request should succeed and you should get back response similar to this one:
