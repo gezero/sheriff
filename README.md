@@ -13,30 +13,29 @@ what we get.
 
 For now you have to broadcast the transaction yourself.
  
-
 To use this project, you need bitcoinJ - go to bitcoinJ github page, clone it and mvn install it. 
 
 Then it should be enough to gradle run the project to start it up.
  
 TODO:
 * broadcast cosigned transaction
+* Updating of the transactions data in db
 
-
-Usage:
 
 Building
---------
+========
 You need BitcoinJ, get the newest version from the BitcoinJ github sources. Install them in local repo.
 Than run `gradlew build`. This should build the project and let you to run it. 
 
 Running the project
--------------------
+===================
 If you successfully build the project you can run it using `java -jar build/libs/sheriff-0.0.1-SNAPSHOT.jar`.
 Second option is to run it directly using the `gradle run` command
 
 Usage
------
-Step one - create multisignature  address:
+=====
+Create multisignature  address
+------------------------------
 Suppose you will create 2 keys yourself like this ones:
 Example Key1:
 
@@ -69,11 +68,11 @@ The request should succeed and you should get back response similar to this one:
         "links":[{"rel":"self","href":"http://localhost/rest/addresses/2NDyZrJZamhofJpkPqCpx6Tcf6ECPzg1ZU1"}]
     }
 
-Here you can see the newly created address as well as the server public key. You should be now able to send get request 
-to the link provided to get new status of the address. (Could be useful for getting balance?) 
+Here you can see the newly created address as well as the server public key. You should be now able to send get request to the link provided to get new status of the address. (Could be useful for getting balance?) 
 You can now send some bitcoins to the address. And see that the Get request will update you with the new balance.
 
-Creating transaction:
+Creating transaction
+--------------------
 When you will have enough balance, you can now send request for creating new transaction for the address. You want to send
 Post request to the URL /rest/transactions with the content similar to this one:
 
@@ -92,6 +91,9 @@ Post request to the URL /rest/transactions with the content similar to this one:
         "rawTransaction":"01000000012330d70f9c8d8059911684f54a2a5751b3090386a0ce57144a3977c0704275d20100000000ffffffff01204e0000000000001976a91436e39da2c6420f1ae8d7c1d80c63e0004c863d4d88ac00000000",
         "links":[{"rel":"self","href":"http://localhost/rest/transactions/1"}]
     }
+    
+Signing the transaction
+-----------------------
   
 You now need to sign the transaction (we want to use 2/3 signing here. And send Post request to the URL that was given to you in the previous response of the following form:
 
