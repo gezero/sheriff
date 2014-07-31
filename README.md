@@ -1,4 +1,4 @@
-sheriff
+Sheriff
 =======
 
 Spring REST application for handle p2sh multiginature addresses
