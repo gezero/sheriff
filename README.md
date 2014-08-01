@@ -5,7 +5,7 @@ Spring REST application for handling p2sh multiginature addresses.
 
 Purpose
 -------
-This project exists because I wanted to test how the whole P2SH world works for myself. Please feel free to reuse the code as you please. I do not guarantie that it works.
+This project exists because I wanted to test how the whole P2SH world works for myself. Please feel free to reuse the code as you please. I do not guarantie that it works. So far everything runs in TestNet.
 
 Showcase
 --------
@@ -22,11 +22,13 @@ TODO list
 ---------
 * broadcast cosigned transaction
 * Updating of the transactions data in db
+* Use other than in memory DB fro storing data (the data is now lost in between restarts)
+* Test the application on Real Bitcoin Network (Currnently we run against testnet)
 
 Building
 ========
 You need BitcoinJ, get the newest version from the [BitcoinJ github sources](https://github.com/bitcoinj/bitcoinj). Install them in local repo.
-Than run `gradlew build`. This should build the project and let you to run it. 
+Than run `gradlew build`. This should build the project and letyou  to run it. 
 
 Running the project
 ===================
