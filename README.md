@@ -5,7 +5,7 @@ Spring REST application for handling p2sh multiginature addresses.
 
 Purpose
 -------
-This project exists because I wanted to test how the whole P2SH world works for myself. Please feel free to reuse the code as you please. I do not guarantie that it works. So far everything runs in TestNet.
+This project exists because I wanted to test how the whole P2SH world works. Please feel free to reuse the code as you please. I do not guarantie that it works. So far everything runs on TestNet.
 
 Showcase
 --------
