@@ -13,22 +13,23 @@ Check the proof of concept test in  [MultisignatureTest.java](https://github.com
 
 What can be done
 ----------------
-So far we are creating P2SH addresses and refreshing balance as new transactions came in.
+So far we are creating P2SH addresses and refreshing balance as new transactions come in.
 We can also create new not signed transaction to spend the money.
 We can also cosign transaction that already has one signature. The cosigning is not very secure yet, basically we sign
-what we get.
+what we get. If we can sign it we sign it.
  
 TODO list
 ---------
 * broadcast cosigned transaction
 * Updating of the transactions data in db
-* Use other than in memory DB fro storing data (the data is now lost in between restarts)
+* Use other than in memory DB for storing data (the data is now lost in between restarts)
 * Test the application on Real Bitcoin Network (Currnently we run against testnet)
+* Adding policy options for cosigning that prohibits application to sign the transaction  (for some time, until user clicks on emal link ...)
 
 Building
 ========
-You need BitcoinJ, get the newest version from the [BitcoinJ github sources](https://github.com/bitcoinj/bitcoinj). Install them in local repo.
-Than run `gradlew build`. This should build the project and letyou  to run it. 
+You need BitcoinJ, get the newest version from the [BitcoinJ github sources](https://github.com/bitcoinj/bitcoinj). Install them in local repo. I usually work with the master branch - currently they are building 0.12-SNAPSHOT.
+Then run `gradlew build`. This should build the project and letyou  to run it. 
 
 Running the project
 ===================
@@ -50,7 +51,7 @@ Example Key2
 * public: 034d6c013aa68cd2e0a7c247eef627586481c35eb00c7f2e1698d6a054059e0b52
 * private: f66641a724879c43444a6ea8aab5da9fd58d5cbffdbf22bbc0ceefc2626cb0c9
 
-You can then send request for a new address by sending post request on to the running server on the /rest/addresses url
+You can then send request for a new address by sending POST request on to the running server on the /rest/addresses url
 with the Json content similar to this one:
 
     {
@@ -71,19 +72,20 @@ The request should succeed and you should get back response similar to this one:
         "links":[{"rel":"self","href":"http://localhost/rest/addresses/2NDyZrJZamhofJpkPqCpx6Tcf6ECPzg1ZU1"}]
     }
 
-Here you can see the newly created address as well as the server public key. You should be now able to send get request to the link provided to get new status of the address. (Could be useful for getting balance?) 
-You can now send some bitcoins to the address. And see that the Get request will update you with the new balance.
+Here you can see the newly created address as well as the server public key. You should be now able to send GET request to the link provided to get new status of the address. (Could be useful for getting balance?) 
+You can now send some bitcoins to the address. And see that the GET request will update you with the new balance.
 
 Creating transaction
 --------------------
-When you will have enough balance, you can now send request for creating new transaction for the address. You want to send
-Post request to the URL /rest/transactions with the content similar to this one:
+When you will have enough balance, you can send request for creating new transaction from the address. You want to send
+POST request to the URL /rest/transactions with the content similar to this one:
 
     {
         "targetAddress":"mkXBTS6T6JmJjKpto9QJmCDWxb5nxg3GAq",
         "amount":20000,
         "sourceAddress":"2NDyZrJZamhofJpkPqCpx6Tcf6ECPzg1ZU1"
     }
+Here is the sourceAddress the address that you created in previeous requests.
  
  This should give you response of the following form:
  
@@ -97,8 +99,7 @@ Post request to the URL /rest/transactions with the content similar to this one:
     
 Signing the transaction
 -----------------------
-  
-You now need to sign the transaction (we want to use 2/3 signing here. And send Post request to the URL that was given to you in the previous response of the following form:
+You now need to sign the transaction with one of your keys (server will provide the second signature for 2/3). And send POST request to the URL that was given to you in the previous response of the following form:
 
     {
         "targetAddress":"mkXBTS6T6JmJjKpto9QJmCDWxb5nxg3GAq",
