@@ -104,14 +104,16 @@ public class AddressWalletTest extends WalletTests {
     }
 
     @Test
-    @Ignore("test is using coins")
+//    @Ignore("test is using coins")
     public void testBasicTransaction() throws Exception {
         P2shAddressResource request = addressRequest();
 
         MvcResult mvcResult = mockMvc.perform(post("/rest/addresses")
                         .content(prepareRequest(request))
                         .contentType(MediaType.APPLICATION_JSON)
-        ).andReturn();
+        )
+                .andDo(print())
+                .andReturn();
         P2shAddressResource address = getContent(mvcResult, P2shAddressResource.class);
 
 
