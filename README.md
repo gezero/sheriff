@@ -1,7 +1,7 @@
 Sheriff
 =======
 
-Spring REST application for handling p2sh multiginature addresses. If you need some explanation on what this is, you can check for instance [Bitcoin 101](http://youtu.be/zIbUSaZBJgU).
+Spring REST application for handling p2sh multiginature addresses. If you need some explanation on what this is, you can check for instance [Bitcoin 101](http://youtu.be/zIbUSaZBJgU) (Note that we run on testnet currently so there are some minor changes to what he say - address start with 2 for instance).
 
 Purpose
 -------
