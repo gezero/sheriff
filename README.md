@@ -1,36 +1,37 @@
 Sheriff
 =======
 
-Spring REST application for handle p2sh multiginature addresses
+Spring REST application for handle p2sh multiginature addresses.
 
+Purpose
+-------
+This project exists because I wanted to test how the whole P2SH world works for myself. Please feel fre to reuse the code as you please. I do not guarantie that it works.
 
-Check the proof of concept test in  src/integration/java/com.bitcoinj.wallet.MultisignatureTest
+Showcase
+--------
+Check the proof of concept test in  [MultisignatureTest.java](https://github.com/gezero/sheriff/blob/master/src/integration/java/com/bitcoinj/wallet/MultisignatureTest.java) if you just want to see how to use bitcoinJ for p2sh addresses. Check the integration test in [AddressWalletTest.java](https://github.com/gezero/sheriff/blob/master/src/integration/java/sheriff/AddressWalletTest.java) to find out more about how to check in more detail how to use this application.
 
+What can be done
+----------------
 So far we are creating P2SH addresses and refreshing balance as new transactions came in.
 We can also create new not signed transaction to spend the money.
 We can also cosign transaction that already has one signature. The cosigning is not very secure yet, basically we sign
 what we get.
-
-For now you have to broadcast the transaction yourself.
  
-To use this project, you need bitcoinJ - go to bitcoinJ github page, clone it and mvn install it. 
-
-Then it should be enough to gradle run the project to start it up.
- 
-TODO:
+TODO list
+---------
 * broadcast cosigned transaction
 * Updating of the transactions data in db
 
-
 Building
 ========
-You need BitcoinJ, get the newest version from the BitcoinJ github sources. Install them in local repo.
+You need BitcoinJ, get the newest version from the [BitcoinJ github sources](https://github.com/bitcoinj/bitcoinj). Install them in local repo.
 Than run `gradlew build`. This should build the project and let you to run it. 
 
 Running the project
 ===================
 If you successfully build the project you can run it using `java -jar build/libs/sheriff-0.0.1-SNAPSHOT.jar`.
-Second option is to run it directly using the `gradle run` command
+Second option is to run it directly using the `gradlew run` command
 
 Usage
 =====
