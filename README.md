@@ -1,7 +1,7 @@
 Sheriff
 =======
 
-Spring REST application builed on spring for handling p2sh multiginature addresses.
+Spring REST application for handling p2sh multiginature addresses.
 
 Purpose
 -------
